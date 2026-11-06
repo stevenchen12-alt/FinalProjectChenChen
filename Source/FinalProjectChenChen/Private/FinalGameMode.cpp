@@ -2,7 +2,7 @@
 
 #include "FinalGameMode.h"
 #include "Blueprint/UserWidget.h"
-//#include "ResultWidget.h"
+#include "ResultWidget.h"
 #include "FinalGameInstance.h"
 #include "GameFramework/PlayerController.h"
 #include "Components/InputComponent.h"
@@ -20,39 +20,39 @@ void AFinalGameMode::BeginPlay() {
 	bGameOver = false;
 	Message = TEXT("");
 	Score = 0;
-	Money = 0;
+	MoneyCollected = 0;
 
 	// Get the score of the previous level (or 0, if it's the first level)
 	UFinalGameInstance* FinalGameInstance = Cast<UFinalGameInstance>(UGameplayStatics::GetGameInstance(GetWorld()));
 
 	if (FinalGameInstance) {
 		Score = FinalGameInstance->Score;
-		Money = FinalGameInstance->MoneyCollected;
+		MoneyCollected = FinalGameInstance->MoneyCollected;
 
 		// If the map is arches
 		FString CurrentMapName = FPaths::GetBaseFilename(GetWorld()->GetMapName());
 
-		if (CurrentMapName.Contains(TEXT("Day_1_Map"))) {
+		if (CurrentMapName.Contains(TEXT("Day1Map"))) {
 			FinalGameInstance->SetDayIndex(0);
 		}
 
-		else if (CurrentMapName.Contains(TEXT("Day_2_Map"))) {
+		else if (CurrentMapName.Contains(TEXT("Day2Map"))) {
 			FinalGameInstance->SetDayIndex(1);
 		}
 
-		else if (CurrentMapName.Contains(TEXT("Day_3_Map"))) {
+		else if (CurrentMapName.Contains(TEXT("Day3Map"))) {
 			FinalGameInstance->SetDayIndex(2);
 		}
 
-		else if (CurrentMapName.Contains(TEXT("Day_4_Map"))) {
+		else if (CurrentMapName.Contains(TEXT("Day4Map"))) {
 			FinalGameInstance->SetDayIndex(3);
 		}
 
-		else if (CurrentMapName.Contains(TEXT("Day_5_Map"))) {
+		else if (CurrentMapName.Contains(TEXT("Day5Map"))) {
 			FinalGameInstance->SetDayIndex(4);
 		}
 
-		else if (CurrentMapName.Contains(TEXT("Day_6_Map"))) {
+		else if (CurrentMapName.Contains(TEXT("Day6Map"))) {
 			FinalGameInstance->SetDayIndex(5);
 		}
 	}
@@ -96,15 +96,15 @@ void AFinalGameMode::EndGame(bool bWon) {
 		if (FinalGameInstance) {
 			FinalGameInstance->AddScore(Score);
 
-			FinalGameInstance->AddMoney(Money);
+			FinalGameInstance->AddMoney(MoneyCollected);
 		}
 	}
 
-	/*if (ResultWidgetClass) {
+	if (ResultWidgetClass) {
 		UResultWidget* ResultWidget = CreateWidget<UResultWidget>(GetWorld(), ResultWidgetClass);
 
 		if (ResultWidget) {
-			ResultWidget->SetupResultScreen(bWon, Score, Message);
+			ResultWidget->SetupResultScreen(bWon, Score, MoneyCollected, Message);
 
 			// Show the widget
 			ResultWidget->AddToViewport();
@@ -118,7 +118,7 @@ void AFinalGameMode::EndGame(bool bWon) {
 				PC->SetInputMode(InputMode);
 			}
 		}
-	}*/
+	}
 }
 
 void AFinalGameMode::HandleTimeExpired() {

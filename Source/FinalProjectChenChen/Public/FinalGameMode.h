@@ -6,8 +6,7 @@
 #include "GameFramework/GameModeBase.h"
 #include "FinalGameMode.generated.h"
 
-
-//class UResultWidget;
+class UResultWidget;
 
 UCLASS()
 class FINALPROJECTCHENCHEN_API AFinalGameMode : public AGameModeBase
@@ -37,14 +36,14 @@ protected:
     float LevelSeconds = 300.f;
 
     /** Assign your WBP_Result child of this on BP_FinalGameMode. */
-    //UPROPERTY(EditDefaultsOnly, Category = "UI")
-    //TSubclassOf<UResultWidget> ResultWidgetClass;
+    UPROPERTY(EditDefaultsOnly, Category = "UI")
+    TSubclassOf<UResultWidget> ResultWidgetClass;
 
     UPROPERTY(BlueprintReadOnly, Category = "Rules")
     int32 Score = 0;
 
     UPROPERTY(BlueprintReadOnly, Category = "Rules")
-    int32 Money = 0;
+    int32 MoneyCollected = 0;
 
     bool bGameOver = false;
     FTimerHandle LevelTimer;
