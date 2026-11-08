@@ -15,7 +15,6 @@ void UResultWidget::NativeConstruct() {
 		RestartGameButton->OnClicked.AddDynamic(this, &UResultWidget::RestartGame);
 	}
 
-
 	// Connect the next button to NextLevel()
 	if (NextButton) {
 		NextButton->OnClicked.AddDynamic(this, &UResultWidget::NextLevel);
@@ -42,7 +41,7 @@ void UResultWidget::SetupResultScreen(bool bWon, int32 Score, int32 MoneyCollect
 
 			if (DayIndex >= 0) {
 				// If it's the last day, show RestartGameButton and RestartLevelButton
-				if (DayIndex == 5) {
+				if (DayIndex == 2) {//5) {
 					if (RestartGameButton) {
 						RestartGameButton->SetVisibility(ESlateVisibility::Visible);
 					}
@@ -126,7 +125,10 @@ void UResultWidget::NextLevel() {
 
 	UFinalGameInstance* FinalGameInstance = Cast<UFinalGameInstance>(UGameplayStatics::GetGameInstance(GetWorld()));
 
+	
 	if (FinalGameInstance) {
+		FinalGameInstance->NextLevel();
+
 		switch (FinalGameInstance->DayIndex) {
 		case 0:
 			NextLevelName = TEXT("/Game/Maps/Day1Map");
@@ -140,7 +142,7 @@ void UResultWidget::NextLevel() {
 			NextLevelName = TEXT("/Game/Maps/Day3Map");
 			break;
 
-		case 3:
+		/*case 3:
 			NextLevelName = TEXT("/Game/Maps/Day4Map");
 			break;
 
@@ -150,7 +152,7 @@ void UResultWidget::NextLevel() {
 
 		case 5:
 			NextLevelName = TEXT("/Game/Maps/Day6Map");
-			break;
+			break;*/
 		}
 
 		if (!NextLevelName.IsNone()) {
