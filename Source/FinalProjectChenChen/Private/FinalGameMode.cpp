@@ -3,6 +3,7 @@
 #include "FinalGameMode.h"
 #include "Blueprint/UserWidget.h"
 #include "ResultWidget.h"
+#include "SettingsWidget.h"
 #include "FinalGameInstance.h"
 #include "GameFramework/PlayerController.h"
 #include "Components/InputComponent.h"
@@ -16,6 +17,28 @@ AFinalGameMode::AFinalGameMode() {
 
 void AFinalGameMode::BeginPlay() {
 	Super::BeginPlay();
+
+	if (!bFirstLoad) {
+		bFirstLoad = true;
+
+		if (SettingsWidgetClass) {
+			USettingsWidget* SettingsWidget = CreateWidget<USettingsWidget>(GetWorld(), SettingsWidgetClass);
+
+			if (SettingsWidget) {
+				// Show the widget
+				SettingsWidget->AddToViewport();
+
+				if (APlayerController* PC = GetWorld()->GetFirstPlayerController()) {
+					PC->SetShowMouseCursor(true);
+
+					// Swap input mode to UI only to be able to click on the widget
+					FInputModeUIOnly InputMode;
+					InputMode.SetWidgetToFocus(SettingsWidget->TakeWidget());
+					PC->SetInputMode(InputMode);
+				}
+			}
+		}
+	}
 
 	bGameOver = false;
 	Message = TEXT("");
@@ -44,7 +67,7 @@ void AFinalGameMode::BeginPlay() {
 			FinalGameInstance->SetDayIndex(2);
 		}
 
-		else if (CurrentMapName.Contains(TEXT("Day4Map"))) {
+		/*else if (CurrentMapName.Contains(TEXT("Day4Map"))) {
 			FinalGameInstance->SetDayIndex(3);
 		}
 
@@ -54,7 +77,7 @@ void AFinalGameMode::BeginPlay() {
 
 		else if (CurrentMapName.Contains(TEXT("Day6Map"))) {
 			FinalGameInstance->SetDayIndex(5);
-		}
+		}*/
 	}
 
 	// Set timer for LevelSeconds. Calls HandleTimeExpired when time runs out
@@ -128,6 +151,41 @@ void AFinalGameMode::HandleTimeExpired() {
 		Message = TEXT("You ran out of time!");
 		EndGame(false);
 	}
+}
+
+void AFinalGameMode::HandleStartingNewPlayer_Implementation(APlayerController* NewPlayer) {
+	Super::HandleStartingNewPlayer_Implementation(NewPlayer);
+
+	if (NewPlayer) {
+		if (UInputComponent* IC = NewPlayer->InputComponent) {
+			// Bind 'z' to DebugWinLevel() through the player's input component
+			IC->BindKey(EKeys::Z, IE_Pressed, this, &AFinalGameMode::DebugWinLevel);
+
+			// Bind 'x' to DebugLoseLevel() through the player's input component
+			IC->BindKey(EKeys::X, IE_Pressed, this, &AFinalGameMode::DebugLoseLevel);
+
+			// Bind 'c' to DebugWinLevelLast() through the player's input component
+			IC->BindKey(EKeys::C, IE_Pressed, this, &AFinalGameMode::DebugWinLevelLast);
+		}
+	}
+}
+
+void AFinalGameMode::DebugWinLevel() {
+	EndGame(true);
+}
+
+void AFinalGameMode::DebugLoseLevel() {
+	EndGame(false);
+}
+
+void AFinalGameMode::DebugWinLevelLast() {
+	UFinalGameInstance* FinalGameInstance = Cast<UFinalGameInstance>(UGameplayStatics::GetGameInstance(GetWorld()));
+
+	if (FinalGameInstance) {
+		FinalGameInstance->SetDayIndex(FinalGameInstance->TotalDays-1);
+	}
+
+	EndGame(true);
 }
 
 // Needs to be implemented

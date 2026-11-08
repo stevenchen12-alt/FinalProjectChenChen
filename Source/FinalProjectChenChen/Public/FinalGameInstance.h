@@ -29,7 +29,7 @@ public:
     int32 PreviousMoneyCollected = 0;
 
     UPROPERTY(BlueprintReadOnly, Category = "Run")
-    int32 TotalDays = 6;
+    int32 TotalDays = 3;//6;
 
     /** Index 0 for Day 1
       * Index 1 for Day 2
