@@ -2,6 +2,8 @@
 
 
 #include "FinalCharacter.h"
+#include "GameFramework/CharacterMovementComponent.h"
+#include "Kismet/GameplayStatics.h"
 
 // Sets default values
 AFinalCharacter::AFinalCharacter()
@@ -51,6 +53,12 @@ void AFinalCharacter::BeginPlay()
 			Subsystem->AddMappingContext(FirstPersonContext, 0);
 		}
 	}
+	
+	UCharacterMovementComponent* Movement = GetCharacterMovement();
+	Movement->GravityScale = GravitySpeed;
+	Movement->JumpZVelocity = JumpZVelocity;
+	Movement->AirControl = AirControl;
+	
 }
 
 // Called every frame

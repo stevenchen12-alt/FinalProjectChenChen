@@ -74,4 +74,15 @@ public:
 	
 	UPROPERTY(EditAnywhere, Category = Animation)
 	TObjectPtr<UAnimBlueprint> FirstPersonDefaultAnim;
+	
+	UPROPERTY(EditAnywhere, Category = "Movement")
+	float GravitySpeed = 1.0f;
+	
+	UPROPERTY(EditAnywhere, Category = "Movement")
+	float JumpZVelocity = 420.f;
+	
+	UPROPERTY(EditAnywhere, Category = "Movement")
+	float AirControl = 0.2f;
+	
+	
 };
