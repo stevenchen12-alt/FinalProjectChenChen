@@ -53,12 +53,12 @@ void AFinalCharacter::BeginPlay()
 			Subsystem->AddMappingContext(FirstPersonContext, 0);
 		}
 	}
-	
 	UCharacterMovementComponent* Movement = GetCharacterMovement();
 	Movement->GravityScale = GravitySpeed;
 	Movement->JumpZVelocity = JumpZVelocity;
 	Movement->AirControl = AirControl;
 	
+	FirstPersonCameraComponent->SetRelativeLocationAndRotation(FirstPersonCameraOffset, FRotator(0.0f, 90.0f, -90.0f));
 }
 
 // Called every frame
