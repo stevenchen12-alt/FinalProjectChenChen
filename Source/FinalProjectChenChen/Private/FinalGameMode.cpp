@@ -50,7 +50,6 @@ void AFinalGameMode::BeginPlay() {
 	MoneyCollected = 0;
 
 	if (FinalGameInstance) {
-		Score = FinalGameInstance->Score;
 		MoneyCollected = FinalGameInstance->MoneyCollected;
 
 		// If the map is arches
@@ -101,6 +100,10 @@ int32 AFinalGameMode::GetScore()
 	return Score;
 }
 
+int32 AFinalGameMode::GetMoneyCollected() {
+	return MoneyCollected;
+}
+
 void AFinalGameMode::EndGame(bool bWon) {
 	if (bGameOver) {
 		return;
@@ -111,17 +114,8 @@ void AFinalGameMode::EndGame(bool bWon) {
 	bGameOver = true;
 
 	if (bWon) {
-		Score += CalculateScore();
+		Score = CalculateScore();
 		Message = TEXT("You completed the building!");
-
-		// Add the score to the game instance
-		UFinalGameInstance* FinalGameInstance = Cast<UFinalGameInstance>(UGameplayStatics::GetGameInstance(GetWorld()));
-
-		if (FinalGameInstance) {
-			FinalGameInstance->AddScore(Score);
-
-			FinalGameInstance->AddMoney(MoneyCollected);
-		}
 	}
 
 	if (ResultWidgetClass) {
@@ -168,6 +162,14 @@ void AFinalGameMode::HandleStartingNewPlayer_Implementation(APlayerController* N
 			// Bind 'c' to DebugWinLevelLast() through the player's input component
 			IC->BindKey(EKeys::C, IE_Pressed, this, &AFinalGameMode::DebugWinLevelLast);
 		}
+	}
+}
+
+void AFinalGameMode::NextLevel() {
+	UFinalGameInstance* FinalGameInstance = Cast<UFinalGameInstance>(UGameplayStatics::GetGameInstance(GetWorld()));
+
+	if (FinalGameInstance) {
+		FinalGameInstance->SaveMoney(MoneyCollected);
 	}
 }
 

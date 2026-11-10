@@ -3,8 +3,8 @@
 
 #include "FinalGameInstance.h"
 
-void UFinalGameInstance::ResetRun() {
-	Score = 0;
+void UFinalGameInstance::RestartGame() {
+	MoneyCollected = 0;
 	DayIndex = 0;
 }
 
@@ -12,13 +12,8 @@ void UFinalGameInstance::NextLevel() {
 	DayIndex++;
 
 	if (DayIndex >= TotalDays) {
-		ResetRun();
+		RestartGame();
 	}
-}
-
-void UFinalGameInstance::RestartLevel() {
-	Score = PreviousScore;
-	MoneyCollected = PreviousMoneyCollected;
 }
 
 void UFinalGameInstance::SetDayIndex(int32 newIndex) {

@@ -3,6 +3,7 @@
 
 #include "ResultWidget.h"
 #include "FinalGameInstance.h"
+#include "FinalGameMode.h"
 #include "Components/Button.h"
 #include "Components/TextBlock.h"
 #include "Kismet/GameplayStatics.h"
@@ -119,6 +120,11 @@ void UResultWidget::NextLevel() {
 
 		FInputModeGameOnly InputMode;
 		PC->SetInputMode(InputMode);
+	}
+
+	// Cast the current game mode to FinalGameMode
+	if (AFinalGameMode* GameMode = Cast<AFinalGameMode>(GetWorld()->GetAuthGameMode())) {
+		GameMode->NextLevel();
 	}
 
 	FName NextLevelName = NAME_None;

@@ -15,18 +15,8 @@ class FINALPROJECTCHENCHEN_API UFinalGameInstance : public UGameInstance
 	GENERATED_BODY()
 
 public:
-    /** Running score across all levels. */
-    UPROPERTY(BlueprintReadOnly, Category = "Run")
-    int32 Score = 0;
-
-    UPROPERTY(BlueprintReadOnly, Category = "Run")
-    int32 PreviousScore = 0;
-
     UPROPERTY(BlueprintReadOnly, Category = "Run")
     int32 MoneyCollected = 0;
-
-    UPROPERTY(BlueprintReadOnly, Category = "Run")
-    int32 PreviousMoneyCollected = 0;
 
     UPROPERTY(BlueprintReadOnly, Category = "Run")
     int32 TotalDays = 3;//6;
@@ -42,21 +32,18 @@ public:
     int32 DayIndex = 0;
 
     UFUNCTION(BlueprintCallable, Category = "Run")
-    void AddScore(int32 Delta) { PreviousScore = Score; Score += Delta; }
-
-    UFUNCTION(BlueprintCallable, Category = "Run")
-    void AddMoney(int32 Delta) { PreviousMoneyCollected = MoneyCollected; MoneyCollected += Delta; }
+    void SaveMoney(int32 NewMoneyCollected) { MoneyCollected = NewMoneyCollected; }
 
     /** Call this when the player chooses Play Again. */
     UFUNCTION(BlueprintCallable, Category = "Run")
-    void ResetRun();
+    void RestartGame();
 
     UFUNCTION(BlueprintCallable, Category = "Run")
     void NextLevel();
 
     /** Call this when the player chooses Restart Level. */
-    UFUNCTION(BlueprintCallable, Category = "Run")
-    void RestartLevel();
+    //UFUNCTION(BlueprintCallable, Category = "Run")
+    //void RestartLevel();
 
     UFUNCTION(BlueprintCallable, Category = "Run")
     void SetDayIndex(int32 newIndex);

@@ -24,7 +24,13 @@ public:
     int32 GetScore();
 
     UFUNCTION(BlueprintPure, Category = "Rules")
+    int32 GetMoneyCollected();
+
+    UFUNCTION(BlueprintPure, Category = "Rules")
     int32 CalculateScore();
+
+    UFUNCTION()
+    void NextLevel();
 
 protected:
     virtual void BeginPlay() override;
