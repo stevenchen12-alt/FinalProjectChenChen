@@ -67,7 +67,7 @@ void AFinalGameMode::BeginPlay() {
 			FinalGameInstance->SetDayIndex(2);
 		}
 
-		/*else if (CurrentMapName.Contains(TEXT("Day4Map"))) {
+		else if (CurrentMapName.Contains(TEXT("Day4Map"))) {
 			FinalGameInstance->SetDayIndex(3);
 		}
 
@@ -77,7 +77,7 @@ void AFinalGameMode::BeginPlay() {
 
 		else if (CurrentMapName.Contains(TEXT("Day6Map"))) {
 			FinalGameInstance->SetDayIndex(5);
-		}*/
+		}
 	}
 
 	// Set timer for LevelSeconds. Calls HandleTimeExpired when time runs out

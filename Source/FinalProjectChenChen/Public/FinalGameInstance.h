@@ -6,9 +6,6 @@
 #include "Engine/GameInstance.h"
 #include "FinalGameInstance.generated.h"
 
-/**
- * 
- */
 UCLASS()
 class FINALPROJECTCHENCHEN_API UFinalGameInstance : public UGameInstance
 {
@@ -19,7 +16,7 @@ public:
     int32 MoneyCollected = 0;
 
     UPROPERTY(BlueprintReadOnly, Category = "Run")
-    int32 TotalDays = 3;//6;
+    int32 TotalDays = 6;
 
     /** Index 0 for Day 1
       * Index 1 for Day 2
@@ -40,10 +37,6 @@ public:
 
     UFUNCTION(BlueprintCallable, Category = "Run")
     void NextLevel();
-
-    /** Call this when the player chooses Restart Level. */
-    //UFUNCTION(BlueprintCallable, Category = "Run")
-    //void RestartLevel();
 
     UFUNCTION(BlueprintCallable, Category = "Run")
     void SetDayIndex(int32 newIndex);

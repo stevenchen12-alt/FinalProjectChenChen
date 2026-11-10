@@ -8,6 +8,7 @@
 
 class UButton;
 class UTextBlock;
+class USpacer;
 
 UCLASS()
 class FINALPROJECTCHENCHEN_API UResultWidget : public UUserWidget
@@ -44,4 +45,10 @@ protected:
 
 	UPROPERTY(meta = (BindWidget))
 	TObjectPtr<UTextBlock> ResultText;
+
+	UPROPERTY(meta = (BindWidget))
+	TObjectPtr<USpacer> Spacer1;
+
+	UPROPERTY(meta = (BindWidget))
+	TObjectPtr<USpacer> Spacer2;
 };

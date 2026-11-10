@@ -6,6 +6,7 @@
 #include "FinalGameMode.h"
 #include "Components/Button.h"
 #include "Components/TextBlock.h"
+#include "Components/Spacer.h"
 #include "Kismet/GameplayStatics.h"
 
 void UResultWidget::NativeConstruct() {
@@ -42,7 +43,7 @@ void UResultWidget::SetupResultScreen(bool bWon, int32 Score, int32 MoneyCollect
 
 			if (DayIndex >= 0) {
 				// If it's the last day, show RestartGameButton and RestartLevelButton
-				if (DayIndex == 2) {//5) {
+				if (DayIndex == 5) {
 					if (RestartGameButton) {
 						RestartGameButton->SetVisibility(ESlateVisibility::Visible);
 					}
@@ -87,6 +88,15 @@ void UResultWidget::SetupResultScreen(bool bWon, int32 Score, int32 MoneyCollect
 
 			if (RestartLevelButton) {
 				RestartLevelButton->SetVisibility(ESlateVisibility::Visible);
+			}
+
+			// Don't show the spacers, so the restart level button is centered
+			if (Spacer1) {
+				Spacer1->SetVisibility(ESlateVisibility::Collapsed);
+			}
+
+			if (Spacer2) {
+				Spacer2->SetVisibility(ESlateVisibility::Collapsed);
 			}
 		}
 	}
@@ -148,7 +158,7 @@ void UResultWidget::NextLevel() {
 			NextLevelName = TEXT("/Game/Maps/Day3Map");
 			break;
 
-		/*case 3:
+		case 3:
 			NextLevelName = TEXT("/Game/Maps/Day4Map");
 			break;
 
@@ -158,7 +168,7 @@ void UResultWidget::NextLevel() {
 
 		case 5:
 			NextLevelName = TEXT("/Game/Maps/Day6Map");
-			break;*/
+			break;
 		}
 
 		if (!NextLevelName.IsNone()) {
@@ -180,6 +190,5 @@ void UResultWidget::RestartLevel() {
 	}
 
 	UGameplayStatics::OpenLevel(this, FName(*GetWorld()->GetName()), false);
-
 }
 
