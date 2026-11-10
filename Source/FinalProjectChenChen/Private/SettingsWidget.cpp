@@ -22,4 +22,7 @@ void USettingsWidget::StartGame() {
 		FInputModeGameOnly InputMode;
 		PC->SetInputMode(InputMode);
 	}
+
+	FName NextLevelName = TEXT("/Game/Maps/Day1Map");
+	UGameplayStatics::OpenLevel(this, NextLevelName, false);
 }

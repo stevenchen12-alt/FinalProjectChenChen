@@ -60,5 +60,6 @@ public:
 
     UFUNCTION(BlueprintCallable, Category = "Run")
     void SetDayIndex(int32 newIndex);
-	
+
+    bool bFirstLoad = true;
 };

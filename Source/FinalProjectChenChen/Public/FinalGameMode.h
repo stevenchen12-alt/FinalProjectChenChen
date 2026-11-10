@@ -55,7 +55,6 @@ protected:
     int32 MoneyCollected = 0;
 
     bool bGameOver = false;
-    bool bFirstLoad = true;
     FTimerHandle LevelTimer;
 
     FString Message;

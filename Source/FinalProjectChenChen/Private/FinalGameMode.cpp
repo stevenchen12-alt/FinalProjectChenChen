@@ -18,23 +18,27 @@ AFinalGameMode::AFinalGameMode() {
 void AFinalGameMode::BeginPlay() {
 	Super::BeginPlay();
 
-	if (!bFirstLoad) {
-		bFirstLoad = true;
+	UFinalGameInstance* FinalGameInstance = Cast<UFinalGameInstance>(UGameplayStatics::GetGameInstance(GetWorld()));
 
-		if (SettingsWidgetClass) {
-			USettingsWidget* SettingsWidget = CreateWidget<USettingsWidget>(GetWorld(), SettingsWidgetClass);
+	if (FinalGameInstance) {
+		if (FinalGameInstance->bFirstLoad) {
+			FinalGameInstance->bFirstLoad = false;
 
-			if (SettingsWidget) {
-				// Show the widget
-				SettingsWidget->AddToViewport();
+			if (SettingsWidgetClass) {
+				USettingsWidget* SettingsWidget = CreateWidget<USettingsWidget>(GetWorld(), SettingsWidgetClass);
 
-				if (APlayerController* PC = GetWorld()->GetFirstPlayerController()) {
-					PC->SetShowMouseCursor(true);
+				if (SettingsWidget) {
+					// Show the widget
+					SettingsWidget->AddToViewport();
 
-					// Swap input mode to UI only to be able to click on the widget
-					FInputModeUIOnly InputMode;
-					InputMode.SetWidgetToFocus(SettingsWidget->TakeWidget());
-					PC->SetInputMode(InputMode);
+					if (APlayerController* PC = GetWorld()->GetFirstPlayerController()) {
+						PC->SetShowMouseCursor(true);
+
+						// Swap input mode to UI only to be able to click on the widget
+						FInputModeUIOnly InputMode;
+						InputMode.SetWidgetToFocus(SettingsWidget->TakeWidget());
+						PC->SetInputMode(InputMode);
+					}
 				}
 			}
 		}
@@ -44,9 +48,6 @@ void AFinalGameMode::BeginPlay() {
 	Message = TEXT("");
 	Score = 0;
 	MoneyCollected = 0;
-
-	// Get the score of the previous level (or 0, if it's the first level)
-	UFinalGameInstance* FinalGameInstance = Cast<UFinalGameInstance>(UGameplayStatics::GetGameInstance(GetWorld()));
 
 	if (FinalGameInstance) {
 		Score = FinalGameInstance->Score;
