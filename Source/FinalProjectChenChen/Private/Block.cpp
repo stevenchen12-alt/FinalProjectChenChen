@@ -13,7 +13,7 @@ ABlock::ABlock()
 	RootComponent = StaticMesh;
 	
 	StaticMesh->SetSimulatePhysics(false);
-	StaticMesh->SetMobility(EComponentMobility::Static);
+	StaticMesh->SetMobility(EComponentMobility::Movable);
 }
 
 // Called when the game starts or when spawned

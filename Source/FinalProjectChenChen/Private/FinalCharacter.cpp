@@ -79,6 +79,9 @@ void AFinalCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComp
 		EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Completed, this, &ACharacter::StopJumping);
 		
 		EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &AFinalCharacter::Look);
+		
+		EnhancedInputComponent->BindAction(PlaceBlockAction, ETriggerEvent::Started, this, &AFinalCharacter::PlaceBlock);
+		EnhancedInputComponent->BindAction(BreakBlockAction, ETriggerEvent::Started, this, &AFinalCharacter::BreakBlock);
 	}
 }
 
@@ -104,4 +107,103 @@ void AFinalCharacter::Look(const FInputActionValue& Value)
 		AddControllerYawInput(LookAxisValue.X);
 		AddControllerPitchInput(LookAxisValue.Y);
 	}
+}
+void AFinalCharacter::PlaceBlock(const FInputActionValue& Value)
+{
+	if (!BlockClass || !FirstPersonCameraComponent) return;
+
+	FVector StartLocation = FirstPersonCameraComponent->GetComponentLocation();
+	FVector LookVector = FirstPersonCameraComponent->GetForwardVector();
+	FVector EndLocation = StartLocation + (LookVector * MaxReachDistance);
+	
+	FHitResult HitResult;
+	FCollisionQueryParams QueryParams;
+	QueryParams.AddIgnoredActor(this);
+	
+	bool bHit = GetWorld()->LineTraceSingleByChannel(HitResult, StartLocation, EndLocation, ECC_Visibility, QueryParams);
+	
+	if (bHit && HitResult.bBlockingHit)
+	{
+		AActor* HitActor = HitResult.GetActor();
+		if (!IsInConstructionArea(HitResult.ImpactPoint, HitActor))
+		{
+			return;
+		}
+		
+		FVector SnappedLocation;
+		
+		if (HitActor && HitActor->ActorHasTag(FName("PlacedBlock")))
+		{
+			FVector BaseLocation = HitActor->GetActorLocation();
+			SnappedLocation = BaseLocation + (HitResult.ImpactNormal * GridSize);
+		}
+		else
+		{
+			SnappedLocation.X = FMath::RoundToFloat(HitResult.ImpactPoint.X / GridSize) * GridSize;
+			SnappedLocation.Y = FMath::RoundToFloat(HitResult.ImpactPoint.Y / GridSize) * GridSize;
+			
+			if (HitResult.ImpactNormal.Z > 0.5f)
+			{
+				SnappedLocation.Z = 0.0f;
+			}
+			else
+			{
+				SnappedLocation.Z = FMath::RoundToFloat((HitResult.ImpactPoint.Z + (HitResult.ImpactNormal.Z * 1.0f)) / GridSize) * GridSize;
+			}
+		}
+		
+		SnappedLocation.X = FMath::RoundToFloat(SnappedLocation.X / GridSize) * GridSize;
+		SnappedLocation.Y = FMath::RoundToFloat(SnappedLocation.Y / GridSize) * GridSize;
+		SnappedLocation.Z = FMath::RoundToFloat(SnappedLocation.Z / GridSize) * GridSize;
+		
+		if (SnappedLocation.Z < 0.0f)
+		{
+			SnappedLocation.Z = 0.0f;
+		}
+		
+		FActorSpawnParameters SpawnParams;
+		SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
+		
+		ABlock* NewBlock = GetWorld()->SpawnActor<ABlock>(BlockClass, SnappedLocation, FRotator::ZeroRotator, SpawnParams);
+		if (NewBlock)
+		{
+			NewBlock->Tags.Add(FName("PlacedBlock"));
+		}
+	}
+}
+void AFinalCharacter::BreakBlock(const FInputActionValue& Value)
+{
+	if (!FirstPersonCameraComponent) return;
+
+	FVector StartTrace = FirstPersonCameraComponent->GetComponentLocation();
+	FVector ForwardVector = FirstPersonCameraComponent->GetForwardVector();
+	FVector EndTrace = StartTrace + (ForwardVector * MaxReachDistance);
+
+	FHitResult HitResult;
+	FCollisionQueryParams QueryParams;
+	QueryParams.AddIgnoredActor(this);
+
+	if (GetWorld()->LineTraceSingleByChannel(HitResult, StartTrace, EndTrace, ECC_Visibility, QueryParams))
+	{
+		AActor* HitActor = HitResult.GetActor();
+		if (HitActor && HitActor->ActorHasTag(FName("PlacedBlock")))
+		{
+			HitActor->Destroy();
+		}
+	}
+}
+
+bool AFinalCharacter::IsInConstructionArea(const FVector& WorldLocation, AActor* HitActor) const
+{
+	if (HitActor && HitActor->ActorHasTag(FName("PlacedBlock")))
+	{
+		return true;
+	}
+	
+	if (HitActor && HitActor->ActorHasTag(FName("DesignatedZone")))
+	{
+		return true;
+	}
+
+	return false;
 }

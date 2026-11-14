@@ -10,6 +10,7 @@
 #include "Camera/CameraComponent.h"
 #include "GameFramework/Character.h"
 #include "EnhancedInputComponent.h"
+#include "Block.h"
 #include "EnhancedInputSubsystems.h" 
 #include "InputActionValue.h"
 #include "FinalCharacter.generated.h"
@@ -43,6 +44,12 @@ protected:
 	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input)
 	TObjectPtr<UInputAction> LookAction;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input|Building")
+	TObjectPtr<UInputAction> PlaceBlockAction;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input|Building")
+	TObjectPtr<UInputAction> BreakBlockAction;
 
 public:	
 	// Called every frame
@@ -56,6 +63,24 @@ public:
 	
 	UFUNCTION()
 	void Look(const FInputActionValue& Value);
+	
+	UFUNCTION()
+	void PlaceBlock(const FInputActionValue& Value);
+	
+	UFUNCTION()
+	void BreakBlock(const FInputActionValue& Value);
+	
+	bool IsInConstructionArea(const FVector& WorldLocation, AActor* HitActor) const;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Building")
+	TSubclassOf<ABlock> BlockClass;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Building")
+	float GridSize = 100.0f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Building")
+	float MaxReachDistance = 500.0f;
+	
 	
 	UPROPERTY(VisibleAnywhere, Category = Camera)
 	TObjectPtr<UCameraComponent> FirstPersonCameraComponent;
@@ -83,6 +108,7 @@ public:
 	
 	UPROPERTY(EditAnywhere, Category = "Movement")
 	float AirControl = 0.2f;
+	
 	
 	
 };
