@@ -108,6 +108,7 @@ void AFinalCharacter::Look(const FInputActionValue& Value)
 		AddControllerPitchInput(LookAxisValue.Y);
 	}
 }
+
 void AFinalCharacter::PlaceBlock(const FInputActionValue& Value)
 {
 	if (!BlockClass || !FirstPersonCameraComponent) return;
@@ -207,3 +208,4 @@ bool AFinalCharacter::IsInConstructionArea(const FVector& WorldLocation, AActor*
 
 	return false;
 }
+
