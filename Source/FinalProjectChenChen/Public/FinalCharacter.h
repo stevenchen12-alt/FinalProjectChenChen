@@ -13,6 +13,7 @@
 #include "Block.h"
 #include "EnhancedInputSubsystems.h" 
 #include "InputActionValue.h"
+#include "PreviewBlock.h"
 #include "FinalCharacter.generated.h"
 
 class UAnimBlueprint;
@@ -72,8 +73,13 @@ public:
 	
 	bool IsInConstructionArea(const FVector& WorldLocation, AActor* HitActor) const;
 	
+	bool GetTargetPlacementLocation(FVector& OutSpawnLocation) const;
+	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Building")
 	TSubclassOf<ABlock> BlockClass;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Building")
+	TSubclassOf<APreviewBlock> PreviewBlockClass;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Building")
 	float GridSize = 100.0f;
@@ -81,6 +87,8 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Building")
 	float MaxReachDistance = 500.0f;
 	
+	UPROPERTY()
+	APreviewBlock* PreviewBlock;
 	
 	UPROPERTY(VisibleAnywhere, Category = Camera)
 	TObjectPtr<UCameraComponent> FirstPersonCameraComponent;

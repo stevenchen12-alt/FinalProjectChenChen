@@ -3,6 +3,8 @@
 
 #include "FinalCharacter.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "Engine/EngineTypes.h"
+#include "Engine/OverlapResult.h"
 #include "Kismet/GameplayStatics.h"
 
 // Sets default values
@@ -66,6 +68,32 @@ void AFinalCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+	// Lazy spawn the preview block once if it doesn't exist yet
+	if (!PreviewBlock && GetWorld() && PreviewBlockClass)
+	{
+		FActorSpawnParameters SpawnParams;
+		SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+		PreviewBlock = GetWorld()->SpawnActor<APreviewBlock>(PreviewBlockClass, FVector::ZeroVector, FRotator::ZeroRotator, SpawnParams);
+		if (PreviewBlock)
+		{
+			PreviewBlock->SetActorEnableCollision(false);
+		}
+	}
+
+	if (PreviewBlock)
+	{
+		FVector TargetLocation;
+		if (GetTargetPlacementLocation(TargetLocation))
+		{
+			PreviewBlock->SetActorHiddenInGame(false);
+			PreviewBlock->SetActorLocation(TargetLocation);
+		}
+		else
+		{
+			// Hide it if the player isn't looking at a valid building area
+			PreviewBlock->SetActorHiddenInGame(true);
+		}
+	}
 }
 
 // Called to bind functionality to input
@@ -109,9 +137,9 @@ void AFinalCharacter::Look(const FInputActionValue& Value)
 	}
 }
 
-void AFinalCharacter::PlaceBlock(const FInputActionValue& Value)
+bool AFinalCharacter::GetTargetPlacementLocation(FVector& OutSpawnLocation) const
 {
-	if (!BlockClass || !FirstPersonCameraComponent) return;
+	if (!FirstPersonCameraComponent) return false;
 
 	FVector StartLocation = FirstPersonCameraComponent->GetComponentLocation();
 	FVector LookVector = FirstPersonCameraComponent->GetForwardVector();
@@ -128,39 +156,64 @@ void AFinalCharacter::PlaceBlock(const FInputActionValue& Value)
 		AActor* HitActor = HitResult.GetActor();
 		if (!IsInConstructionArea(HitResult.ImpactPoint, HitActor))
 		{
-			return;
+			return false;
 		}
-		
-		FVector SnappedLocation;
 		
 		if (HitActor && HitActor->ActorHasTag(FName("PlacedBlock")))
 		{
 			FVector BaseLocation = HitActor->GetActorLocation();
-			SnappedLocation = BaseLocation + (HitResult.ImpactNormal * GridSize);
+			OutSpawnLocation = BaseLocation + (HitResult.ImpactNormal * GridSize);
 		}
 		else
 		{
-			SnappedLocation.X = FMath::RoundToFloat(HitResult.ImpactPoint.X / GridSize) * GridSize;
-			SnappedLocation.Y = FMath::RoundToFloat(HitResult.ImpactPoint.Y / GridSize) * GridSize;
+			OutSpawnLocation.X = FMath::RoundToFloat(HitResult.ImpactPoint.X / GridSize) * GridSize;
+			OutSpawnLocation.Y = FMath::RoundToFloat(HitResult.ImpactPoint.Y / GridSize) * GridSize;
 			
 			if (HitResult.ImpactNormal.Z > 0.5f)
 			{
-				SnappedLocation.Z = 0.0f;
+				OutSpawnLocation.Z = 0.0f;
 			}
 			else
 			{
-				SnappedLocation.Z = FMath::RoundToFloat((HitResult.ImpactPoint.Z + (HitResult.ImpactNormal.Z * 1.0f)) / GridSize) * GridSize;
+				OutSpawnLocation.Z = FMath::RoundToFloat((HitResult.ImpactPoint.Z + (HitResult.ImpactNormal.Z * 1.0f)) / GridSize) * GridSize;
 			}
 		}
 		
-		SnappedLocation.X = FMath::RoundToFloat(SnappedLocation.X / GridSize) * GridSize;
-		SnappedLocation.Y = FMath::RoundToFloat(SnappedLocation.Y / GridSize) * GridSize;
-		SnappedLocation.Z = FMath::RoundToFloat(SnappedLocation.Z / GridSize) * GridSize;
+		OutSpawnLocation.X = FMath::RoundToFloat(OutSpawnLocation.X / GridSize) * GridSize;
+		OutSpawnLocation.Y = FMath::RoundToFloat(OutSpawnLocation.Y / GridSize) * GridSize;
+		OutSpawnLocation.Z = FMath::RoundToFloat(OutSpawnLocation.Z / GridSize) * GridSize;
 		
-		if (SnappedLocation.Z < 0.0f)
+		if (OutSpawnLocation.Z < 0.0f)
 		{
-			SnappedLocation.Z = 0.0f;
+			OutSpawnLocation.Z = 0.0f;
 		}
+		
+		return true;
+	}
+	
+	return false;
+}
+
+void AFinalCharacter::PlaceBlock(const FInputActionValue& Value)
+{
+	if (!BlockClass) return;
+
+	FVector SnappedLocation;
+	if (GetTargetPlacementLocation(SnappedLocation))
+	{
+		FVector BlockCenter = SnappedLocation + FVector(0.0f, 0.0f, GridSize * 0.5f);
+		FVector BlockExtent = FVector(GridSize * 0.45f);
+		
+		TArray<FOverlapResult> OverlapResults;
+		FCollisionShape BoxShape = FCollisionShape::MakeBox(BlockExtent);
+		FCollisionQueryParams OverlapParams;
+		OverlapParams.AddIgnoredActor(this);
+		
+		bool bIsOverlappingPlayer = GetWorld()->OverlapMultiByChannel(
+			OverlapResults, BlockCenter, FQuat::Identity, ECC_Pawn, BoxShape, OverlapParams
+		);
+		
+		if (bIsOverlappingPlayer) return;
 		
 		FActorSpawnParameters SpawnParams;
 		SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
