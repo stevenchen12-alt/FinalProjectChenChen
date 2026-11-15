@@ -30,3 +30,21 @@ void ABlock::Tick(float DeltaTime)
 
 }
 
+UMaterialInterface* ABlock::GetBlockMaterial() const {
+	if (StaticMesh) {
+		return StaticMesh->GetMaterial(0);
+	}
+
+	return nullptr;
+}
+
+void ABlock::SetBlockMaterial(UMaterialInterface* NewMaterial) {
+	if (!NewMaterial) {
+		return;
+	}
+
+	if (StaticMesh) {
+		StaticMesh->SetMaterial(0, NewMaterial);
+	}
+}
+

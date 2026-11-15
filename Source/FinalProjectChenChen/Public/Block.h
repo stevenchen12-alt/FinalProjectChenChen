@@ -15,6 +15,12 @@ public:
 	// Sets default values for this actor's properties
 	ABlock();
 
+	UFUNCTION(BlueprintPure, Category = "Block")
+	UMaterialInterface* GetBlockMaterial() const;
+
+	UFUNCTION(BlueprintCallable, Category = "Block")
+	void SetBlockMaterial(UMaterialInterface* NewMaterial);
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
