@@ -49,35 +49,61 @@ void AFinalGameMode::BeginPlay() {
 	Score = 0;
 	MoneyCollected = 0;
 
+	int32 CurrentDayIndex = 0;
+
 	if (FinalGameInstance) {
 		MoneyCollected = FinalGameInstance->MoneyCollected;
 
-		// If the map is arches
+		// Get the current map name
 		FString CurrentMapName = FPaths::GetBaseFilename(GetWorld()->GetMapName());
 
 		if (CurrentMapName.Contains(TEXT("Day1Map"))) {
-			FinalGameInstance->SetDayIndex(0);
+			CurrentDayIndex = 0;
 		}
 
 		else if (CurrentMapName.Contains(TEXT("Day2Map"))) {
-			FinalGameInstance->SetDayIndex(1);
+			CurrentDayIndex = 1;
 		}
 
 		else if (CurrentMapName.Contains(TEXT("Day3Map"))) {
-			FinalGameInstance->SetDayIndex(2);
+			CurrentDayIndex = 2;
 		}
 
 		else if (CurrentMapName.Contains(TEXT("Day4Map"))) {
-			FinalGameInstance->SetDayIndex(3);
+			CurrentDayIndex = 3;
 		}
 
 		else if (CurrentMapName.Contains(TEXT("Day5Map"))) {
-			FinalGameInstance->SetDayIndex(4);
+			CurrentDayIndex = 4;
 		}
 
 		else if (CurrentMapName.Contains(TEXT("Day6Map"))) {
-			FinalGameInstance->SetDayIndex(5);
+			CurrentDayIndex = 5;
 		}
+
+		FinalGameInstance->SetDayIndex(CurrentDayIndex);
+	}
+
+	// Find PlayerBuildPad and randomly pick a template from the list of today's templates
+	BuildPad = Cast<APlayerBuildPad>(UGameplayStatics::GetActorOfClass(GetWorld(), APlayerBuildPad::StaticClass()));
+
+	if (BuildPad) {
+		if (DayTemplates.IsValidIndex(CurrentDayIndex)) {
+			TArray<TObjectPtr<UStructureTemplate>>& List = DayTemplates[CurrentDayIndex].Templates;
+
+			if (List.Num() > 0) {
+				int32 Index = FMath::RandRange(0, List.Num() - 1);
+				BuildPad->ActiveTemplate = List[Index];
+			}
+
+			else {
+				UE_LOG(LogTemp, Warning, TEXT("AFinalGameMode: Template pool for Day %d is empty!"), CurrentDayIndex + 1);
+			}
+		}
+	}
+
+	else {
+		UE_LOG(LogTemp, Warning, TEXT("AFinalGameMode: No BuildPad found in level!"));
 	}
 
 	// Set timer for LevelSeconds. Calls HandleTimeExpired when time runs out
@@ -88,6 +114,22 @@ void AFinalGameMode::EndPlay(const EEndPlayReason::Type Reason) {
 	GetWorld()->GetTimerManager().ClearTimer(LevelTimer);
 
 	Super::EndPlay(Reason);
+}
+
+void AFinalGameMode::SubmitBuildResult(const FBuildEvaluationResult& Result) {
+	if (bGameOver) {
+		return;
+	}
+
+	LastEvaluation = Result;
+
+	if (Result.Accuracy >= MinAccuracyThreshold && Result.NumCorrectBlocks > 0) {
+		EndGame(true);
+	}
+
+	else {
+		EndGame(false);
+	}
 }
 
 
@@ -115,7 +157,19 @@ void AFinalGameMode::EndGame(bool bWon) {
 
 	if (bWon) {
 		Score = CalculateScore();
-		Message = TEXT("You completed the building!");
+
+		if (LastEvaluation.bIsPerfectMatch) {
+			Message = TEXT("Perfect build! 100$ correct!");
+		}
+
+		else {
+			Message = FString::Printf(TEXT("You completed the building! %d/%d blocks correct!"), LastEvaluation.NumCorrectBlocks, LastEvaluation.TotalTargetBlocks);
+		}
+		
+	}
+
+	else if (Message.IsEmpty()) {
+		Message = FString::Printf(TEXT("You Lose! Only %d/%d blocks were correct!"), LastEvaluation.NumCorrectBlocks, LastEvaluation.TotalTargetBlocks);
 	}
 
 	if (ResultWidgetClass) {
@@ -141,8 +195,13 @@ void AFinalGameMode::EndGame(bool bWon) {
 
 void AFinalGameMode::HandleTimeExpired() {
 	LevelSeconds--;
+
 	if (LevelSeconds <= 0)
 	{
+		if (BuildPad) {
+			LastEvaluation = BuildPad->EvaluateBuild();
+		}
+
 		Message = TEXT("You ran out of time!");
 		EndGame(false);
 	}
@@ -193,6 +252,9 @@ void AFinalGameMode::DebugWinLevelLast() {
 
 // Needs to be implemented
 int32 AFinalGameMode::CalculateScore() {
-	return 0;
+	int32 Points = LastEvaluation.NumCorrectBlocks * PointsPerCorrectBlock;
+	int32 Penalty = LastEvaluation.NumWrongBlocks * PenaltyPerWrongBlock;
+
+	return FMath::Max(0, Points - Penalty);
 }
 
