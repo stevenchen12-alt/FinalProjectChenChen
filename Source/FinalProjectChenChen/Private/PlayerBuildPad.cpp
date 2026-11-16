@@ -18,7 +18,7 @@ FIntVector APlayerBuildPad::WorldToGrid(const FVector& WorldLocation) const {
 		GridSize = ActiveTemplate->GridSize;
 	}
 
-	FVector LocalPosition = GetActorTransform().InverseTransformPosition(WorldLocation);
+	FVector LocalPosition = GetActorTransform().InverseTransformPositionNoScale(WorldLocation);
 
 	return FIntVector(FMath::RoundToInt(LocalPosition.X / GridSize), FMath::RoundToInt(LocalPosition.Y / GridSize), FMath::RoundToInt(LocalPosition.Z / GridSize));
 }
