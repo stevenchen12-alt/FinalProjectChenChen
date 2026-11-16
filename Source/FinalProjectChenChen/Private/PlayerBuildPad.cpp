@@ -2,13 +2,52 @@
 
 
 #include "PlayerBuildPad.h"
+#include "Components/StaticMeshComponent.h"
+#include "Kismet/GameplayStatics.h"
 
 // Sets default values
 APlayerBuildPad::APlayerBuildPad()
 {
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = false;
+
 	RootComponent = CreateDefaultSubobject<USceneComponent>(TEXT("Root"));
+
+	FloorMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("FloorMesh"));
+	FloorMesh->SetupAttachment(RootComponent);
+	FloorMesh->SetCollisionProfileName(TEXT("BlockAll"));
+
+	ConstructionTape1 = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("ConstructionTape1"));
+	ConstructionTape1->SetupAttachment(RootComponent);
+	ConstructionTape1->SetCollisionProfileName(TEXT("NoCollision"));
+
+	ConstructionTape2 = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("ConstructionTape2"));
+	ConstructionTape2->SetupAttachment(RootComponent);
+	ConstructionTape2->SetCollisionProfileName(TEXT("NoCollision"));
+
+	ConstructionTape3 = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("ConstructionTape3"));
+	ConstructionTape3->SetupAttachment(RootComponent);
+	ConstructionTape3->SetCollisionProfileName(TEXT("NoCollision"));
+
+	ConstructionTape4 = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("ConstructionTape4"));
+	ConstructionTape4->SetupAttachment(RootComponent);
+	ConstructionTape4->SetCollisionProfileName(TEXT("NoCollision"));
+
+	CornerCube1 = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("CornerCube1"));
+	CornerCube1->SetupAttachment(RootComponent);
+	CornerCube1->SetCollisionProfileName(TEXT("NoCollision"));
+
+	CornerCube2 = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("CornerCube2"));
+	CornerCube2->SetupAttachment(RootComponent);
+	CornerCube2->SetCollisionProfileName(TEXT("NoCollision"));
+
+	CornerCube3 = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("CornerCube3"));
+	CornerCube3->SetupAttachment(RootComponent);
+	CornerCube3->SetCollisionProfileName(TEXT("NoCollision"));
+
+	CornerCube4 = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("CornerCube4"));
+	CornerCube4->SetupAttachment(RootComponent);
+	CornerCube4->SetCollisionProfileName(TEXT("NoCollision"));
 }
 
 FIntVector APlayerBuildPad::WorldToGrid(const FVector& WorldLocation) const {
@@ -111,6 +150,20 @@ FBuildEvaluationResult APlayerBuildPad::EvaluateBuild() const {
 	}
 
 	return Result;
+}
+
+void APlayerBuildPad::ClearBuildPad() {
+	ResetTrackedLayout();
+
+	TArray<AActor*> FoundBlocks;
+
+	UGameplayStatics::GetAllActorsOfClass(GetWorld(), ABlock::StaticClass(), FoundBlocks);
+
+	for (AActor* BlockActor : FoundBlocks) {
+		if (BlockActor) {
+			BlockActor->Destroy();
+		}
+	}
 }
 
 void APlayerBuildPad::ResetTrackedLayout() {

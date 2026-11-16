@@ -42,6 +42,34 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Validation")
 	TObjectPtr<UStructureTemplate> ActiveTemplate;
 
+	// Static Meshes for the construction area
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Meshes")
+	TObjectPtr<UStaticMeshComponent> FloorMesh;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Meshes")
+	TObjectPtr<UStaticMeshComponent> ConstructionTape1;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Meshes")
+	TObjectPtr<UStaticMeshComponent> ConstructionTape2;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Meshes")
+	TObjectPtr<UStaticMeshComponent> ConstructionTape3;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Meshes")
+	TObjectPtr<UStaticMeshComponent> ConstructionTape4;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Meshes")
+	TObjectPtr<UStaticMeshComponent> CornerCube1;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Meshes")
+	TObjectPtr<UStaticMeshComponent> CornerCube2;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Meshes")
+	TObjectPtr<UStaticMeshComponent> CornerCube3;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Meshes")
+	TObjectPtr<UStaticMeshComponent> CornerCube4;
+
 	// Called after placing a block
 	UFUNCTION(BlueprintCallable, Category = "Validation")
 	void NotifyBlockPlaced(ABlock* Block);
@@ -54,7 +82,11 @@ public:
 	UFUNCTION(BlueprintPure, Category = "Validation")
 	FBuildEvaluationResult EvaluateBuild() const;
 
-	// Clears tracked map when resetting the level
+	// Clears player layout and destroys all blocks on it
+	UFUNCTION(BlueprintCallable, Category = "Validation")
+	void ClearBuildPad();
+
+	// Clears player layout without destroying blocks on it
 	UFUNCTION(BlueprintCallable, Category = "Validation")
 	void ResetTrackedLayout();
 
