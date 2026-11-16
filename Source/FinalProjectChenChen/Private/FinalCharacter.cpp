@@ -34,6 +34,8 @@ AFinalCharacter::AFinalCharacter()
 	FirstPersonCameraComponent->FirstPersonScale = FirstPersonScale;
 
 	BuildPad = Cast<APlayerBuildPad>(UGameplayStatics::GetActorOfClass(GetWorld(), APlayerBuildPad::StaticClass()));
+	
+	InventoryComponent = CreateDefaultSubobject<UInventoryComponent>(TEXT("InventoryComponent"));
 }
 
 // Called when the game starts or when spawned
@@ -69,8 +71,7 @@ void AFinalCharacter::BeginPlay()
 void AFinalCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
-	// Lazy spawn the preview block once if it doesn't exist yet
+	
 	if (!PreviewBlock && GetWorld() && PreviewBlockClass)
 	{
 		FActorSpawnParameters SpawnParams;
@@ -84,15 +85,15 @@ void AFinalCharacter::Tick(float DeltaTime)
 
 	if (PreviewBlock)
 	{
+		bool bHoldingBreakTool = InventoryComponent && InventoryComponent->IsBreakToolEquipped();
 		FVector TargetLocation;
-		if (GetTargetPlacementLocation(TargetLocation))
+		if (!bHoldingBreakTool && GetTargetPlacementLocation(TargetLocation))
 		{
 			PreviewBlock->SetActorHiddenInGame(false);
 			PreviewBlock->SetActorLocation(TargetLocation);
 		}
 		else
 		{
-			// Hide it if the player isn't looking at a valid building area
 			PreviewBlock->SetActorHiddenInGame(true);
 		}
 	}
@@ -112,6 +113,16 @@ void AFinalCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComp
 		
 		EnhancedInputComponent->BindAction(PlaceBlockAction, ETriggerEvent::Started, this, &AFinalCharacter::PlaceBlock);
 		EnhancedInputComponent->BindAction(BreakBlockAction, ETriggerEvent::Started, this, &AFinalCharacter::BreakBlock);
+		
+		if (ScrollSlotAction) EnhancedInputComponent->BindAction(ScrollSlotAction, ETriggerEvent::Triggered, this, &AFinalCharacter::OnScrollSlot);
+		if (SelectSlot1Action) EnhancedInputComponent->BindAction(SelectSlot1Action, ETriggerEvent::Started, this, &AFinalCharacter::SelectSlot1);
+		if (SelectSlot2Action) EnhancedInputComponent->BindAction(SelectSlot2Action, ETriggerEvent::Started, this, &AFinalCharacter::SelectSlot2);
+		if (SelectSlot3Action) EnhancedInputComponent->BindAction(SelectSlot3Action, ETriggerEvent::Started, this, &AFinalCharacter::SelectSlot3);
+		if (SelectSlot4Action) EnhancedInputComponent->BindAction(SelectSlot4Action, ETriggerEvent::Started, this, &AFinalCharacter::SelectSlot4);
+		if (SelectSlot5Action) EnhancedInputComponent->BindAction(SelectSlot5Action, ETriggerEvent::Started, this, &AFinalCharacter::SelectSlot5);
+		if (SelectSlot6Action) EnhancedInputComponent->BindAction(SelectSlot6Action, ETriggerEvent::Started, this, &AFinalCharacter::SelectSlot6);
+		if (SelectSlot7Action) EnhancedInputComponent->BindAction(SelectSlot7Action, ETriggerEvent::Started, this, &AFinalCharacter::SelectSlot7);
+		if (SelectSlot8Action) EnhancedInputComponent->BindAction(SelectSlot8Action, ETriggerEvent::Started, this, &AFinalCharacter::SelectSlot8);
 	}
 }
 
@@ -199,7 +210,12 @@ bool AFinalCharacter::GetTargetPlacementLocation(FVector& OutSpawnLocation) cons
 void AFinalCharacter::PlaceBlock(const FInputActionValue& Value)
 {
 	if (!BlockClass) return;
-
+	
+	if (InventoryComponent->IsBreakToolEquipped())
+	{
+		return;
+	}
+	
 	FVector SnappedLocation;
 	if (GetTargetPlacementLocation(SnappedLocation))
 	{
@@ -229,12 +245,19 @@ void AFinalCharacter::PlaceBlock(const FInputActionValue& Value)
 			{
 				BuildPad->NotifyBlockPlaced(NewBlock);
 			}
+			FBlockSlotData SlotData = InventoryComponent->GetEquippedSlotData();
+			NewBlock->InitializeBlock(SlotData.BlockType, SlotData.BlockMaterial);
 		}
 	}
 }
 void AFinalCharacter::BreakBlock(const FInputActionValue& Value)
 {
 	if (!FirstPersonCameraComponent) return;
+	
+	if (!InventoryComponent->IsBreakToolEquipped())
+	{
+		return;
+	}
 
 	FVector StartTrace = FirstPersonCameraComponent->GetComponentLocation();
 	FVector ForwardVector = FirstPersonCameraComponent->GetForwardVector();
@@ -274,5 +297,13 @@ bool AFinalCharacter::IsInConstructionArea(const FVector& WorldLocation, AActor*
 	}
 
 	return false;
+}
+
+void AFinalCharacter::OnScrollSlot(const FInputActionValue& Value)
+{
+	if (InventoryComponent)
+	{
+		InventoryComponent->CycleSlot(Value.Get<float>());
+	}
 }
 

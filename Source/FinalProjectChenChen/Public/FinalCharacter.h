@@ -10,6 +10,7 @@
 #include "Camera/CameraComponent.h"
 #include "GameFramework/Character.h"
 #include "EnhancedInputComponent.h"
+#include "InventoryComponent.h"
 #include "Block.h"
 #include "EnhancedInputSubsystems.h" 
 #include "InputActionValue.h"
@@ -30,7 +31,7 @@ class FINALPROJECTCHENCHEN_API AFinalCharacter : public ACharacter
 public:
 	// Sets default values for this character's properties
 	AFinalCharacter();
-
+	
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -55,6 +56,44 @@ protected:
 
 	UPROPERTY()
 	TObjectPtr<APlayerBuildPad> BuildPad;
+	
+	
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input|Inventory")
+	TObjectPtr<UInputAction> ScrollSlotAction;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input|Inventory")
+	TObjectPtr<UInputAction> SelectSlot1Action;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input|Inventory")
+	TObjectPtr<UInputAction> SelectSlot2Action;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input|Inventory")
+	TObjectPtr<UInputAction> SelectSlot3Action;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input|Inventory")
+	TObjectPtr<UInputAction> SelectSlot4Action;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input|Inventory")
+	TObjectPtr<UInputAction> SelectSlot5Action;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input|Inventory")
+	TObjectPtr<UInputAction> SelectSlot6Action;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input|Inventory")
+	TObjectPtr<UInputAction> SelectSlot7Action;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input|Inventory")
+	TObjectPtr<UInputAction> SelectSlot8Action;
+
+	void OnScrollSlot(const FInputActionValue& Value);
+	void SelectSlot1() { if (InventoryComponent) InventoryComponent->EquipSlot(EInventorySlot::BreakTool); }
+	void SelectSlot2() { if (InventoryComponent) InventoryComponent->EquipSlot(EInventorySlot::BlockSlot1); }
+	void SelectSlot3() { if (InventoryComponent) InventoryComponent->EquipSlot(EInventorySlot::BlockSlot2); }
+	void SelectSlot4() { if (InventoryComponent) InventoryComponent->EquipSlot(EInventorySlot::BlockSlot3); }
+	void SelectSlot5() { if (InventoryComponent) InventoryComponent->EquipSlot(EInventorySlot::BlockSlot4); }
+	void SelectSlot6() { if (InventoryComponent) InventoryComponent->EquipSlot(EInventorySlot::BlockSlot5); }
+	void SelectSlot7() { if (InventoryComponent) InventoryComponent->EquipSlot(EInventorySlot::BlockSlot6); }
+	void SelectSlot8() { if (InventoryComponent) InventoryComponent->EquipSlot(EInventorySlot::BlockSlot7); }
 
 public:	
 	// Called every frame
@@ -78,6 +117,9 @@ public:
 	bool IsInConstructionArea(const FVector& WorldLocation, AActor* HitActor) const;
 	
 	bool GetTargetPlacementLocation(FVector& OutSpawnLocation) const;
+	
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
+	TObjectPtr<UInventoryComponent> InventoryComponent;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Building")
 	TSubclassOf<ABlock> BlockClass;

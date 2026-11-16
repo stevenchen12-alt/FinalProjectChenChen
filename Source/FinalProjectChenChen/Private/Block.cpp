@@ -48,3 +48,12 @@ void ABlock::SetBlockMaterial(UMaterialInterface* NewMaterial) {
 	}
 }
 
+void ABlock::InitializeBlock(EBlockType NewType, UMaterialInterface* NewMaterial)
+{
+	BlockType = NewType;
+	if (StaticMesh && NewMaterial)
+	{
+		StaticMesh->SetMaterial(0, NewMaterial);
+	}
+}
+
