@@ -97,13 +97,13 @@ void AFinalGameMode::BeginPlay() {
 			}
 
 			else {
-				UE_LOG(LogTemp, Warning, TEXT("AFinalGameMode: Template pool for Day %d is empty!"), CurrentDayIndex + 1);
+				GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, FString::Printf(TEXT("AFinalGameMode: Template pool for Day %d is empty!"), CurrentDayIndex + 1));
 			}
 		}
 	}
 
 	else {
-		UE_LOG(LogTemp, Warning, TEXT("AFinalGameMode: No BuildPad found in level!"));
+		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, TEXT("AFinalGameMode: No BuildPad found in level!"));
 	}
 
 	// Set timer for LevelSeconds. Calls HandleTimeExpired when time runs out
