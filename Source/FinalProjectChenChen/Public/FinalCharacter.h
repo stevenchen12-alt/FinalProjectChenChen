@@ -14,6 +14,7 @@
 #include "EnhancedInputSubsystems.h" 
 #include "InputActionValue.h"
 #include "PreviewBlock.h"
+#include "PlayerBuildPad.h"
 #include "FinalCharacter.generated.h"
 
 class UAnimBlueprint;
@@ -51,6 +52,9 @@ protected:
 	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input|Building")
 	TObjectPtr<UInputAction> BreakBlockAction;
+
+	UPROPERTY()
+	TObjectPtr<APlayerBuildPad> BuildPad;
 
 public:	
 	// Called every frame

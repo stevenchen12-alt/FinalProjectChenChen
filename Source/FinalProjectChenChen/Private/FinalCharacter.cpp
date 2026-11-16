@@ -32,6 +32,8 @@ AFinalCharacter::AFinalCharacter()
 	FirstPersonCameraComponent->bEnableFirstPersonScale = true;
 	FirstPersonCameraComponent->FirstPersonFieldOfView = FirstPersonFieldOfView;
 	FirstPersonCameraComponent->FirstPersonScale = FirstPersonScale;
+
+	BuildPad = Cast<APlayerBuildPad>(UGameplayStatics::GetActorOfClass(GetWorld(), APlayerBuildPad::StaticClass()));
 }
 
 // Called when the game starts or when spawned
@@ -222,6 +224,11 @@ void AFinalCharacter::PlaceBlock(const FInputActionValue& Value)
 		if (NewBlock)
 		{
 			NewBlock->Tags.Add(FName("PlacedBlock"));
+
+			if (BuildPad)
+			{
+				BuildPad->NotifyBlockPlaced(NewBlock);
+			}
 		}
 	}
 }
@@ -242,6 +249,13 @@ void AFinalCharacter::BreakBlock(const FInputActionValue& Value)
 		AActor* HitActor = HitResult.GetActor();
 		if (HitActor && HitActor->ActorHasTag(FName("PlacedBlock")))
 		{
+			if (BuildPad)
+			{
+				if (ABlock* HitBlock = Cast<ABlock>(HitActor))
+				{
+					BuildPad->NotifyBlockRemoved(HitBlock);
+				}
+			}
 			HitActor->Destroy();
 		}
 	}

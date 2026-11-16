@@ -11,6 +11,8 @@ APlayerBuildPad::APlayerBuildPad()
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = false;
 
+	Tags.Add(FName("DesignatedZone"));
+
 	RootComponent = CreateDefaultSubobject<USceneComponent>(TEXT("Root"));
 
 	FloorMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("FloorMesh"));
