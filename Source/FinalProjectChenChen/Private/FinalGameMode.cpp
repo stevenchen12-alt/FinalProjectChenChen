@@ -8,6 +8,7 @@
 #include "GameFramework/PlayerController.h"
 #include "Components/InputComponent.h"
 #include "Kismet/GameplayStatics.h"
+#include "ReferenceBoard.h"
 
 
 AFinalGameMode::AFinalGameMode() {
@@ -94,6 +95,16 @@ void AFinalGameMode::BeginPlay() {
 			if (List.Num() > 0) {
 				int32 Index = FMath::RandRange(0, List.Num() - 1);
 				BuildPad->ActiveTemplate = List[Index];
+
+				TArray<AActor*> FoundBoards;
+
+				UGameplayStatics::GetAllActorsOfClass(GetWorld(), AReferenceBoard::StaticClass(), FoundBoards);
+
+				for (AActor* BoardActor : FoundBoards) {
+					if (AReferenceBoard* Board = Cast<AReferenceBoard>(BoardActor)) {
+						Board->UpdateDisplayedImage();
+					}
+				}
 			}
 
 			else {
