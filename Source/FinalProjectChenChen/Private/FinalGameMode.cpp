@@ -159,7 +159,7 @@ void AFinalGameMode::EndGame(bool bWon) {
 		Score = CalculateScore();
 
 		if (LastEvaluation.bIsPerfectMatch) {
-			Message = TEXT("Perfect build! 100$ correct!");
+			Message = TEXT("Perfect build! 100% correct!");
 		}
 
 		else {
