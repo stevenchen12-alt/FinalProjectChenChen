@@ -4,6 +4,8 @@
 #include "FinalHUD.h"
 #include "FinalGameMode.h"
 #include "Blueprint/UserWidget.h"
+#include "InventoryComponent.h"
+#include "FinalCharacter.h"
 #include "Kismet/GameplayStatics.h"
 
 void AFinalHUD::BeginPlay()
@@ -21,3 +23,4 @@ int32 AFinalHUD::GetCurrentScore()
 	}
 	return 0;
 }
+

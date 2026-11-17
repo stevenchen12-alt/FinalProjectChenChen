@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/HUD.h"
+#include "InventoryComponent.h"
 #include "FinalHUD.generated.h"
 
 /**
@@ -26,7 +27,5 @@ public:
 	
 	UFUNCTION(BlueprintPure, Category = "HUD Data") 
 	int32 GetCurrentScore();
-	
-
 }
 ;
