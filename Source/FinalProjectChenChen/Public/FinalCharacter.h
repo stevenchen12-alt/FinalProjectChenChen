@@ -113,7 +113,7 @@ public:
 	UFUNCTION()
 	void BreakBlock(const FInputActionValue& Value);
 	
-	bool IsInConstructionArea(const FVector& WorldLocation, AActor* HitActor) const;
+	bool IsInConstructionArea(const FVector& WorldLocation, AActor* HitActor, UPrimitiveComponent* HitComponent) const;
 	
 	bool GetTargetPlacementLocation(FVector& OutSpawnLocation) const;
 	

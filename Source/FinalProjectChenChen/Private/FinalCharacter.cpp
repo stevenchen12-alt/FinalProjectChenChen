@@ -171,7 +171,7 @@ bool AFinalCharacter::GetTargetPlacementLocation(FVector& OutSpawnLocation) cons
 	if (bHit && HitResult.bBlockingHit)
 	{
 		AActor* HitActor = HitResult.GetActor();
-		if (!IsInConstructionArea(HitResult.ImpactPoint, HitActor))
+		if (!IsInConstructionArea(HitResult.ImpactPoint, HitActor, HitResult.GetComponent()))
 		{
 			return false;
 		}
@@ -292,14 +292,14 @@ void AFinalCharacter::BreakBlock(const FInputActionValue& Value)
 	}
 }
 
-bool AFinalCharacter::IsInConstructionArea(const FVector& WorldLocation, AActor* HitActor) const
+bool AFinalCharacter::IsInConstructionArea(const FVector& WorldLocation, AActor* HitActor, UPrimitiveComponent* HitComponent) const
 {
 	if (HitActor && HitActor->ActorHasTag(FName("PlacedBlock")))
 	{
 		return true;
 	}
 	
-	if (HitActor && HitActor->ActorHasTag(FName("DesignatedZone")))
+	if (HitComponent && HitComponent->ComponentHasTag(FName("DesignatedZone")))
 	{
 		return true;
 	}
