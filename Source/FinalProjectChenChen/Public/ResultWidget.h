@@ -17,7 +17,7 @@ class FINALPROJECTCHENCHEN_API UResultWidget : public UUserWidget
 
 public:
 	UFUNCTION(BlueprintCallable, Category = "UI")
-	void SetupResultScreen(bool bWon, int32 Score, int32 MoneyCollected, FString& Message);
+	void SetupResultScreen(bool bWon, int32 Score, int32 MoneyCollected, float Accuracy, FString& Message);
 
 protected:
 	virtual void NativeConstruct() override;

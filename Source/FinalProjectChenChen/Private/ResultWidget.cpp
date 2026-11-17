@@ -28,7 +28,7 @@ void UResultWidget::NativeConstruct() {
 	}
 }
 
-void UResultWidget::SetupResultScreen(bool bWon, int32 Score, int32 MoneyCollected, FString& Message) {
+void UResultWidget::SetupResultScreen(bool bWon, int32 Score, int32 MoneyCollected, float Accuracy, FString& Message) {
 	if (ResultTitleText) {
 		if (bWon) {
 			ResultTitleText->SetText(FText::FromString("You Win!"));
@@ -102,11 +102,11 @@ void UResultWidget::SetupResultScreen(bool bWon, int32 Score, int32 MoneyCollect
 	}
 
 	if (ResultText) {
-		Message += TEXT("\n\nScore: ");
-		Message += FString::FromInt(Score);
+		Message += FString::Printf(TEXT("\n\nAccuracy: %.1f%%"), Accuracy);
 
-		Message += TEXT("\n\nMoney Collected: ");
-		Message += FString::FromInt(MoneyCollected);
+		Message += FString::Printf(TEXT("\nScore: %d"), Score);
+
+		Message += FString::Printf(TEXT("\nMoney Collected: %d"), MoneyCollected);
 
 		ResultText->SetText(FText::FromString(Message));
 	}

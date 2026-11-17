@@ -143,6 +143,8 @@ FBuildEvaluationResult APlayerBuildPad::EvaluateBuild() const {
 	int32 NetCorrect = FMath::Max(0, Result.NumCorrectBlocks - Result.NumWrongBlocks);
 	Result.Accuracy = (static_cast<float>(NetCorrect) / static_cast<float>(Result.TotalTargetBlocks)) * 100.0f;
 
+	//GEngine->AddOnScreenDebugMessage(-1, 20.0f, FColor::Yellow, FString::Printf(TEXT("Correct Blocks: %d, Wrong Blocks: %d, Total Blocks: %d, Net Correct Blocks: %d, Accuracy: %.1f"), Result.NumCorrectBlocks, Result.NumWrongBlocks, Result.TotalTargetBlocks, NetCorrect, Result.Accuracy));
+
 	if (Result.NumCorrectBlocks == Result.TotalTargetBlocks) {
 		Result.bIsPerfectMatch = true;
 	}
