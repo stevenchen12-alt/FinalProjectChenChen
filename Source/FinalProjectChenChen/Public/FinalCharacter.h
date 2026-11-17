@@ -57,7 +57,6 @@ protected:
 	UPROPERTY()
 	TObjectPtr<APlayerBuildPad> BuildPad;
 	
-	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input|Inventory")
 	TObjectPtr<UInputAction> ScrollSlotAction;
 
@@ -120,6 +119,12 @@ public:
 	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
 	TObjectPtr<UInventoryComponent> InventoryComponent;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Building Materials")
+	TArray<TObjectPtr<UMaterialInterface>> AvailableMaterials;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Building Materials")
+	TObjectPtr<UMaterialInterface> CurrentMaterial;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Building")
 	TSubclassOf<ABlock> BlockClass;

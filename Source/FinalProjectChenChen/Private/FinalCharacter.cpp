@@ -32,8 +32,6 @@ AFinalCharacter::AFinalCharacter()
 	FirstPersonCameraComponent->bEnableFirstPersonScale = true;
 	FirstPersonCameraComponent->FirstPersonFieldOfView = FirstPersonFieldOfView;
 	FirstPersonCameraComponent->FirstPersonScale = FirstPersonScale;
-
-	BuildPad = Cast<APlayerBuildPad>(UGameplayStatics::GetActorOfClass(GetWorld(), APlayerBuildPad::StaticClass()));
 	
 	InventoryComponent = CreateDefaultSubobject<UInventoryComponent>(TEXT("InventoryComponent"));
 }
@@ -65,6 +63,12 @@ void AFinalCharacter::BeginPlay()
 	Movement->AirControl = AirControl;
 	
 	FirstPersonCameraComponent->SetRelativeLocationAndRotation(FirstPersonCameraOffset, FRotator(0.0f, 90.0f, -90.0f));
+
+	BuildPad = Cast<APlayerBuildPad>(UGameplayStatics::GetActorOfClass(GetWorld(), APlayerBuildPad::StaticClass()));
+
+	if (!CurrentMaterial && AvailableMaterials.IsValidIndex(0)) {
+		CurrentMaterial = AvailableMaterials[0];
+	}
 }
 
 // Called every frame
@@ -240,6 +244,10 @@ void AFinalCharacter::PlaceBlock(const FInputActionValue& Value)
 		if (NewBlock)
 		{
 			NewBlock->Tags.Add(FName("PlacedBlock"));
+
+			if (CurrentMaterial) {
+				NewBlock->SetBlockMaterial(CurrentMaterial);
+			}
 
 			if (BuildPad)
 			{
