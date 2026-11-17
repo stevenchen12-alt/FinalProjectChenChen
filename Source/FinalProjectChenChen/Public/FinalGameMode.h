@@ -105,6 +105,7 @@ private:
 
     void HandleTimeExpired();
     int32 CalculateScore();
+    int32 CalculateMoneyCollected();
 
     void DebugWinLevel();
     void DebugLoseLevel();

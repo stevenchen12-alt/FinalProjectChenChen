@@ -166,9 +166,10 @@ void AFinalGameMode::EndGame(bool bWon) {
 
 	bGameOver = true;
 
-	if (bWon) {
-		Score = CalculateScore();
+	Score = CalculateScore();
+	MoneyCollected = CalculateMoneyCollected();
 
+	if (bWon) {
 		if (LastEvaluation.bIsPerfectMatch) {
 			Message = TEXT("Perfect build! 100% correct!");
 		}
@@ -187,7 +188,7 @@ void AFinalGameMode::EndGame(bool bWon) {
 		UResultWidget* ResultWidget = CreateWidget<UResultWidget>(GetWorld(), ResultWidgetClass);
 
 		if (ResultWidget) {
-			ResultWidget->SetupResultScreen(bWon, Score, MoneyCollected, Message);
+			ResultWidget->SetupResultScreen(bWon, Score, MoneyCollected, LastEvaluation.Accuracy, Message);
 
 			// Show the widget
 			ResultWidget->AddToViewport();
@@ -261,7 +262,6 @@ void AFinalGameMode::DebugWinLevelLast() {
 	EndGame(true);
 }
 
-// Needs to be implemented
 int32 AFinalGameMode::CalculateScore() {
 	int32 Points = LastEvaluation.NumCorrectBlocks * PointsPerCorrectBlock;
 	int32 Penalty = LastEvaluation.NumWrongBlocks * PenaltyPerWrongBlock;
@@ -269,3 +269,6 @@ int32 AFinalGameMode::CalculateScore() {
 	return FMath::Max(0, Points - Penalty);
 }
 
+int32 AFinalGameMode::CalculateMoneyCollected() {
+	return FMath::RoundToInt(LastEvaluation.Accuracy * (Score / 100.0f));
+}
