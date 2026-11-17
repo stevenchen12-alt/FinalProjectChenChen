@@ -171,10 +171,6 @@ bool AFinalCharacter::GetTargetPlacementLocation(FVector& OutSpawnLocation) cons
 	if (bHit && HitResult.bBlockingHit)
 	{
 		AActor* HitActor = HitResult.GetActor();
-		if (!IsInConstructionArea(HitResult.ImpactPoint, HitActor, HitResult.GetComponent()))
-		{
-			return false;
-		}
 		
 		if (HitActor && HitActor->ActorHasTag(FName("PlacedBlock")))
 		{
@@ -203,6 +199,11 @@ bool AFinalCharacter::GetTargetPlacementLocation(FVector& OutSpawnLocation) cons
 		if (OutSpawnLocation.Z < 0.0f)
 		{
 			OutSpawnLocation.Z = 0.0f;
+		}
+		
+		if (!IsInConstructionArea(HitResult.ImpactPoint, HitActor, HitResult.GetComponent()))
+		{
+			return false;
 		}
 		
 		return true;
@@ -294,17 +295,25 @@ void AFinalCharacter::BreakBlock(const FInputActionValue& Value)
 
 bool AFinalCharacter::IsInConstructionArea(const FVector& WorldLocation, AActor* HitActor, UPrimitiveComponent* HitComponent) const
 {
-	if (HitActor && HitActor->ActorHasTag(FName("PlacedBlock")))
+	if (!BuildPad || !BuildPad->FloorMesh)
 	{
-		return true;
-	}
-	
-	if (HitComponent && HitComponent->ComponentHasTag(FName("DesignatedZone")))
-	{
-		return true;
+		return false;
 	}
 
-	return false;
+	// Get the world-space bounding box of the FloorMesh
+	const FBoxSphereBounds FloorBounds = BuildPad->FloorMesh->Bounds;
+	const FVector Origin = FloorBounds.Origin;
+	const FVector Extent = FloorBounds.BoxExtent;
+	
+	const float TapeOffset = 50.0f;
+
+	const bool bWithinX = (WorldLocation.X >= Origin.X - Extent.X + TapeOffset) &&
+						  (WorldLocation.X <= Origin.X + Extent.X - TapeOffset);
+
+	const bool bWithinY = (WorldLocation.Y >= Origin.Y - Extent.Y + TapeOffset) &&
+						  (WorldLocation.Y <= Origin.Y + Extent.Y - TapeOffset);
+
+	return bWithinX && bWithinY;
 }
 
 void AFinalCharacter::OnScrollSlot(const FInputActionValue& Value)
