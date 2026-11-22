@@ -20,6 +20,8 @@ struct FDayTemplateList {
     TArray<TObjectPtr<UStructureTemplate>> Templates;
 };
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnMoneyChanged, int32, NewAmount);
+
 UCLASS()
 class FINALPROJECTCHENCHEN_API AFinalGameMode : public AGameModeBase
 {
@@ -40,10 +42,16 @@ public:
     float GetTimeRemaining() const;
 
     UFUNCTION(BlueprintPure, Category = "Rules")
-    int32 GetScore();
+    int32 GetScore() const;
 
-    UFUNCTION(BlueprintPure, Category = "Rules")
-    int32 GetMoneyCollected();
+    UFUNCTION(BlueprintPure, Category = "Money")
+    int32 GetMoneyCollected() const;
+
+    UPROPERTY(BlueprintAssignable, Category = "Money")
+    FOnMoneyChanged OnMoneyChanged;
+
+    UFUNCTION(BlueprintCallable, Category = "Money")
+    bool SpendMoney(int32 Amount);
 
     UFUNCTION(BlueprintCallable, Category = "Rules")
     void EndGame(bool bWon);

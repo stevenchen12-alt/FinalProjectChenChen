@@ -9,6 +9,7 @@
 #include "Components/InputComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "ReferenceBoard.h"
+#include "FinalCharacter.h"
 
 
 AFinalGameMode::AFinalGameMode() {
@@ -148,13 +149,24 @@ float AFinalGameMode::GetTimeRemaining() const {
 	return LevelSeconds;
 }
 
-int32 AFinalGameMode::GetScore()
+int32 AFinalGameMode::GetScore() const 
 {
 	return Score;
 }
 
-int32 AFinalGameMode::GetMoneyCollected() {
+int32 AFinalGameMode::GetMoneyCollected() const {
 	return MoneyCollected;
+}
+
+bool AFinalGameMode::SpendMoney(int32 Amount) {
+	if (Amount < 0 || GetMoneyCollected() < Amount) {
+		return false;
+	}
+
+	MoneyCollected -= Amount;
+	OnMoneyChanged.Broadcast(MoneyCollected);
+
+	return true;
 }
 
 void AFinalGameMode::EndGame(bool bWon) {
@@ -241,6 +253,12 @@ void AFinalGameMode::NextLevel() {
 
 	if (FinalGameInstance) {
 		FinalGameInstance->SaveMoney(MoneyCollected);
+
+		if (AFinalCharacter* Player = Cast<AFinalCharacter>(UGameplayStatics::GetPlayerCharacter(this, 0))) {
+			if (UInventoryComponent* InventoryComponent = Player->FindComponentByClass<UInventoryComponent>()) {
+				FinalGameInstance->SavePowerups(InventoryComponent->PurchasedItems);
+			}
+		}
 	}
 }
 

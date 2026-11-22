@@ -6,6 +6,8 @@
 #include "Engine/GameInstance.h"
 #include "FinalGameInstance.generated.h"
 
+class UShopItemData;
+
 UCLASS()
 class FINALPROJECTCHENCHEN_API UFinalGameInstance : public UGameInstance
 {
@@ -14,6 +16,9 @@ class FINALPROJECTCHENCHEN_API UFinalGameInstance : public UGameInstance
 public:
     UPROPERTY(BlueprintReadOnly, Category = "Run")
     int32 MoneyCollected = 0;
+
+    UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Run")
+    TMap<TObjectPtr<UShopItemData>, int32> PurchasedItems;
 
     UPROPERTY(BlueprintReadOnly, Category = "Run")
     int32 TotalDays = 6;
@@ -30,6 +35,8 @@ public:
 
     UFUNCTION(BlueprintCallable, Category = "Run")
     void SaveMoney(int32 NewMoneyCollected) { MoneyCollected = NewMoneyCollected; }
+
+    void SavePowerups(const TMap<TObjectPtr<UShopItemData>, int32>& NewPurchasedItems) { PurchasedItems = NewPurchasedItems; }
 
     /** Call this when the player chooses Play Again. */
     UFUNCTION(BlueprintCallable, Category = "Run")
