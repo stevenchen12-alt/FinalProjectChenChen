@@ -7,6 +7,8 @@
 #include "Block.h"
 #include "InventoryComponent.generated.h"
 
+class UShopItemData;
+
 UENUM(BlueprintType)
 enum class EInventorySlot : uint8
 {
@@ -44,6 +46,7 @@ struct FBlockSlotData
     int32 Count = 0;
 };
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnEquippedSlotChanged, EInventorySlot, NewSlot, FBlockSlotData, SlotData);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnPurchasedItemAdded, UShopItemData*, Item, int32, NewQuantity);
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class FINALPROJECTCHENCHEN_API UInventoryComponent : public UActorComponent
@@ -83,6 +86,20 @@ public:
     
 	UFUNCTION(BlueprintPure, Category = "Inventory")
 	int32 GetCount(EInventorySlot Slot) const;
+
+	// For powerups
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Shop Inventory")
+	TMap<TObjectPtr<UShopItemData>, int32> PurchasedItems;
+
+	UPROPERTY(BlueprintAssignable, Category = "Shop Inventory")
+	FOnPurchasedItemAdded OnPurchasedItemAdded;
+
+	UFUNCTION(BlueprintCallable, Category = "Shop Inventory")
+	void AddPurchasedItem(UShopItemData* Item, int32 Quantity = 1);
+
+	UFUNCTION(BlueprintPure, Category = "Shop Inventory") 
+	int32 GetPurchasedItemQuantity(UShopItemData* Item) const;
+
 protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;

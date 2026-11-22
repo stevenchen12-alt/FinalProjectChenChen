@@ -1,6 +1,8 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 #include "InventoryComponent.h"
+#include "ShopItemData.h"
+#include "FinalGameInstance.h"
 
 UInventoryComponent::UInventoryComponent()
 {
@@ -16,6 +18,11 @@ void UInventoryComponent::BeginPlay()
 		{
 			Pair.Value.Count = Pair.Value.Capacity;
 		}
+	}
+
+	// Load in saved powerups from the game instance
+	if (UFinalGameInstance* GameInstance = Cast<UFinalGameInstance>(GetWorld()->GetGameInstance())) {
+		PurchasedItems = GameInstance->PurchasedItems;
 	}
 }
 
@@ -127,4 +134,24 @@ int32 UInventoryComponent::GetCount(EInventorySlot Slot) const
 		return 0;
 	}
 	return SlotData->Count;
+}
+
+// For powerups
+void UInventoryComponent::AddPurchasedItem(UShopItemData* Item, int32 Quantity) {
+	if (!Item || Quantity <= 0) {
+		return;
+	}
+
+	int32& CurrentQuantity = PurchasedItems.FindOrAdd(Item);
+	CurrentQuantity += Quantity;
+
+	OnPurchasedItemAdded.Broadcast(Item, CurrentQuantity);
+}
+
+int32 UInventoryComponent::GetPurchasedItemQuantity(UShopItemData* Item) const {
+	if (const int32* FoundQuantity = PurchasedItems.Find(Item)) {
+		return *FoundQuantity;
+	}
+
+	return 0;
 }
