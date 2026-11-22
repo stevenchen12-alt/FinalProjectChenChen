@@ -10,6 +10,13 @@ UInventoryComponent::UInventoryComponent()
 void UInventoryComponent::BeginPlay()
 {
 	Super::BeginPlay();
+	for (TPair<EInventorySlot, FBlockSlotData>& Pair : Slots)
+	{
+		if (!Pair.Value.bIsBreakTool)
+		{
+			Pair.Value.Count = Pair.Value.Capacity;
+		}
+	}
 }
 
 void UInventoryComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
@@ -67,4 +74,57 @@ FBlockSlotData UInventoryComponent::GetEquippedSlotData() const
 		return *Data;
 	}
 	return FBlockSlotData();
+}
+
+bool UInventoryComponent::AddBlockByType(EBlockType BrokenType)
+{
+	if (BrokenType == EBlockType::None)
+	{
+		return false;
+	}
+
+	for (TPair<EInventorySlot, FBlockSlotData>& Pair : Slots)
+	{
+		FBlockSlotData& SlotData = Pair.Value;
+		if (!SlotData.bIsBreakTool && SlotData.BlockType == BrokenType)
+		{
+			if (SlotData.Count >= SlotData.Capacity)
+			{
+				return false;
+			}
+
+			SlotData.Count++;
+			return true;
+		}
+	}
+	return false;
+}
+
+bool UInventoryComponent::ConsumeEquipped()
+{
+	FBlockSlotData* SlotData = Slots.Find(EquippedSlot);
+	if (!SlotData || SlotData->bIsBreakTool || SlotData->Count <= 0)
+	{
+		return false;
+	}
+
+	SlotData->Count--;
+	OnSlotChanged.Broadcast(EquippedSlot, *SlotData);
+	return true;
+}
+
+bool UInventoryComponent::CanPlaceEquipped() const
+{
+	const FBlockSlotData* SlotData = Slots.Find(EquippedSlot);
+	return SlotData && !SlotData->bIsBreakTool && SlotData->Count > 0;
+}
+
+int32 UInventoryComponent::GetCount(EInventorySlot Slot) const
+{
+	const FBlockSlotData* SlotData = Slots.Find(Slot);
+	if (!SlotData)
+	{
+		return 0;
+	}
+	return SlotData->Count;
 }

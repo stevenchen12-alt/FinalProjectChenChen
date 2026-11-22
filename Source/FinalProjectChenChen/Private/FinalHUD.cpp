@@ -24,3 +24,15 @@ int32 AFinalHUD::GetCurrentScore()
 	return 0;
 }
 
+int32 AFinalHUD::GetSlotCount(EInventorySlot Slot) const
+{
+	if (AFinalCharacter* Character = Cast<AFinalCharacter>(GetOwningPawn()))
+	{
+		if (Character->InventoryComponent)
+		{
+			return Character->InventoryComponent->GetCount(Slot);
+		}
+	}
+	return 0;
+}
+

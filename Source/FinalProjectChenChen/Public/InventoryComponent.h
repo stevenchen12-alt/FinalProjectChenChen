@@ -36,6 +36,12 @@ struct FBlockSlotData
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Slot")
 	FText DisplayName;
+	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Slot", meta = (ClampMin = "0"))
+    int32 Capacity = 20;
+    
+    UPROPERTY(BlueprintReadOnly, Category = "Slot")
+    int32 Count = 0;
 };
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnEquippedSlotChanged, EInventorySlot, NewSlot, FBlockSlotData, SlotData);
 
@@ -65,6 +71,18 @@ public:
 
 	UPROPERTY(BlueprintAssignable, Category = "Inventory")
 	FOnEquippedSlotChanged OnSlotChanged;
+	
+    UFUNCTION(BlueprintCallable, Category = "Inventory")
+    bool AddBlockByType(EBlockType BrokenType);
+    
+	UFUNCTION(BlueprintCallable, Category = "Inventory")
+	bool ConsumeEquipped();
+    
+	UFUNCTION(BlueprintPure, Category = "Inventory")
+	bool CanPlaceEquipped() const;
+    
+	UFUNCTION(BlueprintPure, Category = "Inventory")
+	int32 GetCount(EInventorySlot Slot) const;
 protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;

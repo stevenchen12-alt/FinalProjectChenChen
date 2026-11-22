@@ -89,9 +89,9 @@ void AFinalCharacter::Tick(float DeltaTime)
 
 	if (PreviewBlock)
 	{
-		bool bHoldingBreakTool = InventoryComponent && InventoryComponent->IsBreakToolEquipped();
+		bool bCanPlace = InventoryComponent && InventoryComponent->CanPlaceEquipped();
 		FVector TargetLocation;
-		if (!bHoldingBreakTool && GetTargetPlacementLocation(TargetLocation))
+		if (bCanPlace && GetTargetPlacementLocation(TargetLocation))
 		{
 			PreviewBlock->SetActorHiddenInGame(false);
 			PreviewBlock->SetActorLocation(TargetLocation);
@@ -216,7 +216,7 @@ void AFinalCharacter::PlaceBlock(const FInputActionValue& Value)
 {
 	if (!BlockClass) return;
 	
-	if (InventoryComponent->IsBreakToolEquipped())
+	if (!InventoryComponent || !InventoryComponent->CanPlaceEquipped())
 	{
 		return;
 	}
@@ -245,7 +245,7 @@ void AFinalCharacter::PlaceBlock(const FInputActionValue& Value)
 		if (NewBlock)
 		{
 			NewBlock->Tags.Add(FName("PlacedBlock"));
-
+			
 			if (CurrentMaterial) {
 				NewBlock->SetBlockMaterial(CurrentMaterial);
 			}
@@ -256,6 +256,7 @@ void AFinalCharacter::PlaceBlock(const FInputActionValue& Value)
 			}
 			FBlockSlotData SlotData = InventoryComponent->GetEquippedSlotData();
 			NewBlock->InitializeBlock(SlotData.BlockType, SlotData.BlockMaterial);
+			InventoryComponent->ConsumeEquipped();
 		}
 	}
 }
@@ -286,6 +287,7 @@ void AFinalCharacter::BreakBlock(const FInputActionValue& Value)
 				if (ABlock* HitBlock = Cast<ABlock>(HitActor))
 				{
 					BuildPad->NotifyBlockRemoved(HitBlock);
+					InventoryComponent->AddBlockByType(HitBlock->BlockType);
 				}
 			}
 			HitActor->Destroy();

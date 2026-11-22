@@ -27,5 +27,8 @@ public:
 	
 	UFUNCTION(BlueprintPure, Category = "HUD Data") 
 	int32 GetCurrentScore();
+	
+	UFUNCTION(BlueprintPure, Category = "HUD Data")
+	int32 GetSlotCount(EInventorySlot Slot) const;
 }
 ;
