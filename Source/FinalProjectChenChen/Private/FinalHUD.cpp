@@ -36,3 +36,23 @@ int32 AFinalHUD::GetSlotCount(EInventorySlot Slot) const
 	return 0;
 }
 
+FString AFinalHUD::GetTimeLeft() const
+{
+	if (AFinalGameMode* GameMode = Cast<AFinalGameMode>(UGameplayStatics::GetGameMode(GetWorld())))
+	{
+		float TimeRemaining = GameMode->GetTimeRemaining();
+		int32 Minutes = FMath::FloorToInt(TimeRemaining / 60.f);
+		int32 Seconds = FMath::Modulo(TimeRemaining, 60.f);
+		return FString::Printf(TEXT("%02d:%02d"), Minutes, Seconds);
+	}
+	return TEXT("00:00");
+}
+
+int32 AFinalHUD::GetMoney() const
+{
+	if (AFinalGameMode* GameMode = Cast<AFinalGameMode>(UGameplayStatics::GetGameMode(GetWorld())))
+	{
+		return GameMode->GetMoneyCollected();
+	}
+	return 0;
+}

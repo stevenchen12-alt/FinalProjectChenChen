@@ -30,5 +30,11 @@ public:
 	
 	UFUNCTION(BlueprintPure, Category = "HUD Data")
 	int32 GetSlotCount(EInventorySlot Slot) const;
+	
+	UFUNCTION(BlueprintPure, Category = "HUD Data")
+	FString GetTimeLeft() const;
+	
+	UFUNCTION(BlueprintPure, Category = "HUD Data")
+	int32 GetMoney() const;
 }
 ;
