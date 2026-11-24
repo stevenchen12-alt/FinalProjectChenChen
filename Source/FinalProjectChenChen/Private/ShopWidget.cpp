@@ -8,6 +8,7 @@
 #include "Components/PanelWidget.h"
 #include "Components/TextBlock.h"
 #include "Components/Button.h"
+#include "Components/WrapBoxSlot.h"
 #include "Kismet/GameplayStatics.h"
 
 void UShopWidget::NativeConstruct() {
@@ -59,16 +60,21 @@ void UShopWidget::RefreshCatalog() {
 
 	for (int32 i = 0; i < ShopComponent->Catalog.Num(); i++) {
 		if (UShopItemSlotWidget* SlotWidget = CreateWidget<UShopItemSlotWidget>(this, ItemSlotClass)) {
-			SlotWidget->SetupSlot(ShopComponent, InventoryComponent, i, ShopComponent->Catalog[i]);
 			
-			ItemsContainer->AddChild(SlotWidget);
+			if (UWrapBoxSlot* BoxSlot = Cast<UWrapBoxSlot>(ItemsContainer->AddChild(SlotWidget))) {
+				BoxSlot->SetHorizontalAlignment(HAlign_Center);
+				BoxSlot->SetVerticalAlignment(VAlign_Center);
+				//BoxSlot->SetPadding(FMargin(0.0f, 10.0f));
+			}
+
+			SlotWidget->SetupSlot(ShopComponent, InventoryComponent, i, ShopComponent->Catalog[i]);
 		}
 	}
 }
 
 void UShopWidget::UpdateMoneyDisplay(int32 NewAmount) {
 	if (MoneyCollectedText) {
-		MoneyCollectedText->SetText(FText::AsNumber(NewAmount));
+		MoneyCollectedText->SetText(FText::Format(FText::FromString(TEXT("Money Collected: {0}")), FText::AsNumber(NewAmount)));
 	}
 }
 

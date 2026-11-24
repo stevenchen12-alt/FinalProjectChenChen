@@ -6,6 +6,7 @@
 #include "Components/Image.h"
 #include "Components/TextBlock.h"
 #include "Components/Button.h"
+#include "Engine/Engine.h"
 
 void UShopItemSlotWidget::NativeConstruct() {
 	Super::NativeConstruct();
@@ -25,8 +26,15 @@ void UShopItemSlotWidget::SetupSlot(UShopComponent* ShopComp, UInventoryComponen
 		return;
 	}
 
+	FString DebugMsg = FString::Printf(
+		TEXT("ItemIcon valid: %d | DataAsset Icon valid: %d"),
+		ItemIcon != nullptr,
+		(Item.Item && Item.Item->Icon != nullptr)
+	);
+	GEngine->AddOnScreenDebugMessage(-1, 10.0f, FColor::Yellow, DebugMsg);
+
 	if (ItemIcon && Item.Item->Icon) {
-		ItemIcon->SetBrushFromTexture(Item.Item->Icon);
+		ItemIcon->SetBrushFromTexture(Item.Item->Icon, false);
 	}
 
 	if (ItemNameText) {
@@ -34,12 +42,12 @@ void UShopItemSlotWidget::SetupSlot(UShopComponent* ShopComp, UInventoryComponen
 	}
 
 	if (PriceText) {
-		PriceText->SetText(FText::AsNumber(Item.GetPrice()));
+		PriceText->SetText(FText::Format(FText::FromString(TEXT("Price: {0}")), FText::AsNumber(Item.GetPrice())));
 	}
 
 	if (StockText) {
 		if (Item.Stock == -1) {
-			StockText->SetText(FText::FromString(TEXT("Unlimited")));
+			StockText->SetText(FText::FromString(TEXT("Stock: Unlimited")));
 		}
 
 		else if (Item.Stock == -1) {
