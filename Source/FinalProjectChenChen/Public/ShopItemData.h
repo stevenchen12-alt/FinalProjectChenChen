@@ -25,5 +25,5 @@ public:
 	TObjectPtr<UStaticMesh> ItemMesh = nullptr;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Item", meta = (ClampMin = "0"))
-	int32 BasePrice = 10;
+	int32 BasePrice = 500;
 };
