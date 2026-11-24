@@ -12,13 +12,6 @@ UInventoryComponent::UInventoryComponent()
 void UInventoryComponent::BeginPlay()
 {
 	Super::BeginPlay();
-	for (TPair<EInventorySlot, FBlockSlotData>& Pair : Slots)
-	{
-		if (!Pair.Value.bIsBreakTool)
-		{
-			Pair.Value.Count = Pair.Value.Capacity;
-		}
-	}
 
 	// Load in saved powerups from the game instance
 	if (UFinalGameInstance* GameInstance = Cast<UFinalGameInstance>(GetWorld()->GetGameInstance())) {

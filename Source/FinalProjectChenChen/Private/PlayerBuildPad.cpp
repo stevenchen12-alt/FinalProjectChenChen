@@ -152,7 +152,7 @@ FBuildEvaluationResult APlayerBuildPad::EvaluateBuild() const {
 	else {
 		Result.bIsPerfectMatch = false;
 	}
-
+	
 	return Result;
 }
 
@@ -180,4 +180,34 @@ UTexture2D* APlayerBuildPad::GetReferenceImage() const {
 	}
 
 	return nullptr;
+}
+
+void APlayerBuildPad::BakeBlocksOnPadToTemplate()
+{
+	if (!ActiveTemplate || !GetWorld())
+	{
+		UE_LOG(LogTemp, Warning, TEXT("APlayerBuildPad: Assign ActiveTemplate before baking!"));
+		return;
+	}
+
+	TArray<AActor*> FoundBlocks;
+	UGameplayStatics::GetAllActorsOfClass(GetWorld(), ABlock::StaticClass(), FoundBlocks);
+
+	ActiveTemplate->Modify();
+	ActiveTemplate->Layout.Empty();
+
+	for (AActor* Actor : FoundBlocks)
+	{
+		ABlock* Block = Cast<ABlock>(Actor);
+		
+		FVector LocalPos = GetActorTransform().InverseTransformPositionNoScale(Block->GetActorLocation());
+		if (FMath::Abs(LocalPos.X) <= 600.0f && FMath::Abs(LocalPos.Y) <= 600.0f && LocalPos.Z >= -10.0f)
+		{
+			FIntVector GridCoord = WorldToGrid(Block->GetActorLocation());
+			if (UMaterialInterface* Mat = Block->GetBlockMaterial())
+			{
+				ActiveTemplate->Layout.Add(GridCoord, Mat);
+			}
+		}
+	}
 }

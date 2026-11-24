@@ -97,6 +97,9 @@ public:
 	// Converts block's world location into local x, y, z coordinates
 	UFUNCTION(BlueprintPure, Category = "Validation")
 	FIntVector WorldToGrid(const FVector& WorldLocation) const;
+	
+	UFUNCTION(CallInEditor, Category = "Validation")
+	void BakeBlocksOnPadToTemplate();
 
 private:
 	// Tracks the player's current blocks

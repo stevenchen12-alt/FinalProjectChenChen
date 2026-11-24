@@ -249,14 +249,14 @@ void AFinalCharacter::PlaceBlock(const FInputActionValue& Value)
 			if (CurrentMaterial) {
 				NewBlock->SetBlockMaterial(CurrentMaterial);
 			}
-
+			FBlockSlotData SlotData = InventoryComponent->GetEquippedSlotData();
+			NewBlock->InitializeBlock(SlotData.BlockType, SlotData.BlockMaterial);
+			InventoryComponent->ConsumeEquipped();
+			
 			if (BuildPad)
 			{
 				BuildPad->NotifyBlockPlaced(NewBlock);
 			}
-			FBlockSlotData SlotData = InventoryComponent->GetEquippedSlotData();
-			NewBlock->InitializeBlock(SlotData.BlockType, SlotData.BlockMaterial);
-			InventoryComponent->ConsumeEquipped();
 		}
 	}
 }
@@ -302,7 +302,6 @@ bool AFinalCharacter::IsInConstructionArea(const FVector& WorldLocation, AActor*
 		return false;
 	}
 
-	// Get the world-space bounding box of the FloorMesh
 	const FBoxSphereBounds FloorBounds = BuildPad->FloorMesh->Bounds;
 	const FVector Origin = FloorBounds.Origin;
 	const FVector Extent = FloorBounds.BoxExtent;
