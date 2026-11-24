@@ -43,6 +43,9 @@ protected:
 
 private:
 	UFUNCTION()
+	void OnCloseButtonClicked();
+
+	UFUNCTION()
 	void RefreshCatalog();
 
 	UFUNCTION()

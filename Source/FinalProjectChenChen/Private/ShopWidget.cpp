@@ -14,8 +14,8 @@ void UShopWidget::NativeConstruct() {
 	Super::NativeConstruct();
 
 	if (CloseButton) {
-		CloseButton->OnClicked.RemoveDynamic(this, &UShopWidget::CloseShop);
-		CloseButton->OnClicked.AddDynamic(this, &UShopWidget::CloseShop);
+		CloseButton->OnClicked.RemoveDynamic(this, &UShopWidget::OnCloseButtonClicked);
+		CloseButton->OnClicked.AddDynamic(this, &UShopWidget::OnCloseButtonClicked);
 	}
 }
 
@@ -69,6 +69,16 @@ void UShopWidget::RefreshCatalog() {
 void UShopWidget::UpdateMoneyDisplay(int32 NewAmount) {
 	if (MoneyCollectedText) {
 		MoneyCollectedText->SetText(FText::AsNumber(NewAmount));
+	}
+}
+
+void UShopWidget::OnCloseButtonClicked() {
+	if (AFinalGameMode* GameMode = Cast<AFinalGameMode>(UGameplayStatics::GetGameMode(this))) {
+		GameMode->ToggleShop();
+	}
+
+	else {
+		CloseShop();
 	}
 }
 

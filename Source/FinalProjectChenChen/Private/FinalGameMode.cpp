@@ -6,15 +6,21 @@
 #include "SettingsWidget.h"
 #include "FinalGameInstance.h"
 #include "GameFramework/PlayerController.h"
+#include "GameFramework/Pawn.h"
 #include "Components/InputComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "ReferenceBoard.h"
 #include "FinalCharacter.h"
+#include "ShopComponent.h"
+#include "ShopWidget.h"
+#include "InventoryComponent.h"
 
 
 AFinalGameMode::AFinalGameMode() {
 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
+
+	ShopComponent = CreateDefaultSubobject<UShopComponent>(TEXT("ShopComponent"));
 }
 
 void AFinalGameMode::BeginPlay() {
@@ -244,6 +250,9 @@ void AFinalGameMode::HandleStartingNewPlayer_Implementation(APlayerController* N
 
 			// Bind 'c' to DebugWinLevelLast() through the player's input component
 			IC->BindKey(EKeys::C, IE_Pressed, this, &AFinalGameMode::DebugWinLevelLast);
+
+			// Bind 'p' to ToggleShop() through the player's input component
+			IC->BindKey(EKeys::P, IE_Pressed, this, &AFinalGameMode::ToggleShop);
 		}
 	}
 }
@@ -289,4 +298,43 @@ int32 AFinalGameMode::CalculateScore() {
 
 int32 AFinalGameMode::CalculateMoneyCollected() {
 	return FMath::RoundToInt(LastEvaluation.Accuracy * (Score / 100.0f));
+}
+
+void AFinalGameMode::ToggleShop() {
+	APlayerController* PC = UGameplayStatics::GetPlayerController(this, 0);
+
+	if (!PC) {
+		return;
+	}
+
+	// Close the shop if it's already open
+	if (ActiveShopWidget && ActiveShopWidget->IsInViewport()) {
+		ActiveShopWidget->CloseShop();
+		ActiveShopWidget = nullptr;
+
+		return;
+	}
+
+	// Get the inventory component
+	APawn* PlayerPawn = PC->GetPawn();
+	
+	if (PlayerPawn) {
+		UInventoryComponent* InventoryComponent = PlayerPawn->FindComponentByClass<UInventoryComponent>();
+
+		if (ShopWidgetClass && ShopComponent && InventoryComponent) {
+			ActiveShopWidget = CreateWidget<UShopWidget>(PC, ShopWidgetClass);
+
+			if (ActiveShopWidget) {
+				ActiveShopWidget->AddToViewport();
+
+				ActiveShopWidget->InitializeShop(ShopComponent, InventoryComponent);
+
+				FInputModeGameAndUI InputMode;
+				InputMode.SetWidgetToFocus(ActiveShopWidget->TakeWidget());
+				PC->SetInputMode(InputMode);
+				PC->bShowMouseCursor = true;
+			}
+		}
+	}
+	
 }

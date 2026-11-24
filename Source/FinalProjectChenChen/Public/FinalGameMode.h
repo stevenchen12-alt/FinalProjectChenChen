@@ -10,6 +10,8 @@
 class UResultWidget;
 class USettingsWidget;
 class UStructureTemplate;
+class UShopComponent;
+class UShopWidget;
 
 // Wrapper for list of templates for each day
 USTRUCT(BlueprintType) 
@@ -59,6 +61,12 @@ public:
     UFUNCTION(BlueprintCallable, Category = "Rules")
     void NextLevel();
 
+    UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Shop")
+    TObjectPtr<UShopComponent> ShopComponent;
+
+    UFUNCTION(BlueprintCallable, Category = "Shop")
+    void ToggleShop();
+
 protected:
     // Index 0 = Day 1
     // Index 1 = Day 2
@@ -104,12 +112,17 @@ protected:
     UPROPERTY(BlueprintReadOnly, Category = "Scoring")
     FBuildEvaluationResult LastEvaluation;
 
+    UPROPERTY(EditDefaultsOnly, Category = "Shop")
+    TSubclassOf<UShopWidget> ShopWidgetClass;
     
 private:
     FTimerHandle LevelTimer;
 
     UPROPERTY()
     TObjectPtr<APlayerBuildPad> BuildPad;
+
+    UPROPERTY()
+    TObjectPtr<UShopWidget> ActiveShopWidget;
 
     void HandleTimeExpired();
     int32 CalculateScore();
