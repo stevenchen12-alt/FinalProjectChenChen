@@ -6,7 +6,6 @@
 #include "Components/Image.h"
 #include "Components/TextBlock.h"
 #include "Components/Button.h"
-#include "Engine/Engine.h"
 
 void UShopItemSlotWidget::NativeConstruct() {
 	Super::NativeConstruct();
@@ -25,13 +24,6 @@ void UShopItemSlotWidget::SetupSlot(UShopComponent* ShopComp, UInventoryComponen
 	if (!Item.Item) {
 		return;
 	}
-
-	FString DebugMsg = FString::Printf(
-		TEXT("ItemIcon valid: %d | DataAsset Icon valid: %d"),
-		ItemIcon != nullptr,
-		(Item.Item && Item.Item->Icon != nullptr)
-	);
-	GEngine->AddOnScreenDebugMessage(-1, 10.0f, FColor::Yellow, DebugMsg);
 
 	if (ItemIcon && Item.Item->Icon) {
 		ItemIcon->SetBrushFromTexture(Item.Item->Icon, false);

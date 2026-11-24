@@ -145,6 +145,9 @@ void UInventoryComponent::AddPurchasedItem(UShopItemData* Item, int32 Quantity) 
 	int32& CurrentQuantity = PurchasedItems.FindOrAdd(Item);
 	CurrentQuantity += Quantity;
 
+	FString Message = FString::Printf(TEXT("Added to Inventory: %s | Total Owned: %d"), *Item->DisplayName.ToString(), CurrentQuantity);
+	GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Green, Message);
+
 	OnPurchasedItemAdded.Broadcast(Item, CurrentQuantity);
 }
 
