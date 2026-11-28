@@ -3,10 +3,13 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
 #include "Block.h"
+#include "PickupStationMinigame.h"
 #include "PickupStation.generated.h"
 
 class UBoxComponent;
 class UStaticMeshComponent;
+class UPickupMinigameWidget;
+class AFinalCharacter;
 
 UCLASS()
 class FINALPROJECTCHENCHEN_API APickupStation : public AActor
@@ -16,21 +19,33 @@ class FINALPROJECTCHENCHEN_API APickupStation : public AActor
 public:
 	APickupStation();
 
+	UFUNCTION(BlueprintCallable, Category = "Pickup")
+	void AttemptStopMinigame();
+
 protected:
 	virtual void BeginPlay() override;
+	virtual void EndPlay(const EEndPlayReason::Type Reason) override;
 
 	UFUNCTION()
-	void HandleOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor,
-					   UPrimitiveComponent* OtherComp, int32 OtherBodyIndex,
-					   bool bFromSweep, const FHitResult& Sweep);
+	void HandleBeginOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor,
+							UPrimitiveComponent* OtherComp, int32 OtherBodyIndex,
+							bool bFromSweep, const FHitResult& Sweep);
 
+	UFUNCTION()
+	void HandleEndOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor,
+						  UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
+
+	void CloseMinigameUI();
 	void Restock();
-	
+
+	UFUNCTION(BlueprintImplementableEvent, Category = "Pickup")
+	void OnAvailabilityChanged(bool bIsAvailable);
+
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Pickup")
 	EBlockType BlockType = EBlockType::RedBrick;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Pickup", meta = (ClampMin = "1"))
-	int32 AmountPerPickup = 1;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Pickup")
+	TSubclassOf<UPickupStationMinigame> MinigameWidgetClass;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Tuning", meta = (ClampMin = "0.0", Units = "s"))
 	float RestockSeconds = 5.0f;
@@ -44,5 +59,14 @@ protected:
 	UPROPERTY(BlueprintReadOnly, Category = "Pickup")
 	bool bAvailable = true;
 
+private:
+	UPROPERTY(Transient)
+	TObjectPtr<UPickupStationMinigame> ActiveWidget;
+
+	UPROPERTY(Transient)
+	TObjectPtr<AFinalCharacter> OverlappingPlayer;
+
+	bool bMinigameResolved = false;
 	FTimerHandle RestockTimer;
+	FTimerHandle CloseUITimer;
 };

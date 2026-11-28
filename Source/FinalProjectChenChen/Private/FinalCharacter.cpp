@@ -4,6 +4,7 @@
 #include "FinalCharacter.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Engine/EngineTypes.h"
+#include "PickupStation.h"
 #include "Engine/OverlapResult.h"
 #include "Kismet/GameplayStatics.h"
 
@@ -216,6 +217,12 @@ void AFinalCharacter::PlaceBlock(const FInputActionValue& Value)
 {
 	if (!BlockClass) return;
 	
+	if (ActivePickupStation)
+	{
+		ActivePickupStation->AttemptStopMinigame();
+		return;
+	}
+	
 	if (!InventoryComponent || !InventoryComponent->CanPlaceEquipped())
 	{
 		return;
@@ -269,6 +276,12 @@ void AFinalCharacter::BreakBlock(const FInputActionValue& Value)
 		return;
 	}
 
+	if (ActivePickupStation)
+	{
+		ActivePickupStation->AttemptStopMinigame();
+		return;
+	}
+	
 	FVector StartTrace = FirstPersonCameraComponent->GetComponentLocation();
 	FVector ForwardVector = FirstPersonCameraComponent->GetForwardVector();
 	FVector EndTrace = StartTrace + (ForwardVector * MaxReachDistance);

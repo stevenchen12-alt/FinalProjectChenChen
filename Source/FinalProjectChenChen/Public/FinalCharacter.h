@@ -57,6 +57,9 @@ protected:
 	UPROPERTY()
 	TObjectPtr<APlayerBuildPad> BuildPad;
 	
+	UPROPERTY(Transient)
+	TObjectPtr<class APickupStation> ActivePickupStation;
+	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input|Inventory")
 	TObjectPtr<UInputAction> ScrollSlotAction;
 
@@ -117,6 +120,8 @@ public:
 	
 	bool GetTargetPlacementLocation(FVector& OutSpawnLocation) const;
 	
+	void SetActivePickupStation(class APickupStation* NewStation) { ActivePickupStation = NewStation; }
+	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
 	TObjectPtr<UInventoryComponent> InventoryComponent;
 
@@ -140,6 +145,8 @@ public:
 	
 	UPROPERTY()
 	APreviewBlock* PreviewBlock;
+	
+	
 	
 	UPROPERTY(VisibleAnywhere, Category = Camera)
 	TObjectPtr<UCameraComponent> FirstPersonCameraComponent;
